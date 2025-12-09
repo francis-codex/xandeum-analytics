@@ -1,16 +1,53 @@
 'use client';
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { useAllPNodes, useNetworkStats } from "@/lib/hooks";
 import { NetworkStatsDisplay } from "@/components/NetworkStats";
 import { NodeCard } from "@/components/NodeCard";
+import { InsightsPanel } from "@/components/InsightsPanel";
+import { AtRiskNodesCard } from "@/components/AtRiskNodesCard";
+import { HealthScoreBreakdown } from "@/components/HealthScoreBreakdown";
 import { LoadingPage } from "@/components/ui/loading";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import {
+  generateNetworkEvents,
+  assessNetworkRisk,
+  calculateNetworkHealth,
+} from "@/lib/intelligence";
 
 export default function Home() {
   const { data: stats, isLoading: statsLoading, error: statsError } = useNetworkStats();
   const { data: nodes, isLoading: nodesLoading, error: nodesError } = useAllPNodes();
+
+  // Generate intelligent insights
+  const networkEvents = useMemo(() => {
+    if (!stats || !nodes) return [];
+    return generateNetworkEvents(stats, nodes);
+  }, [stats, nodes]);
+
+  const riskAssessment = useMemo(() => {
+    if (!nodes) return {
+      atRiskCount: 0,
+      atRiskNodes: [],
+      criticalCount: 0,
+      warningCount: 0,
+      riskCategories: { storage: 0, uptime: 0, version: 0, latency: 0 },
+    };
+    return assessNetworkRisk(nodes);
+  }, [nodes]);
+
+  const healthBreakdown = useMemo(() => {
+    if (!stats || !nodes) return {
+      availability: 0,
+      versionHealth: 0,
+      distribution: 0,
+      storageHealth: 0,
+      totalScore: 0,
+    };
+    return calculateNetworkHealth(stats, nodes);
+  }, [stats, nodes]);
 
   if (statsLoading || nodesLoading) {
     return <LoadingPage message="Loading pNode network data..." />;
@@ -67,6 +104,24 @@ export default function Home() {
             Network Overview
           </h2>
           {stats && <NetworkStatsDisplay stats={stats} />}
+        </section>
+
+        {/* Intelligence Layer - Phase 1 */}
+        <section className="mb-8">
+          <div className="grid gap-6 lg:grid-cols-3 mb-6">
+            {/* Insights Panel */}
+            <div className="lg:col-span-2">
+              <InsightsPanel events={networkEvents} />
+            </div>
+
+            {/* At Risk Nodes */}
+            <div className="lg:col-span-1">
+              <AtRiskNodesCard assessment={riskAssessment} />
+            </div>
+          </div>
+
+          {/* Health Score Breakdown */}
+          <HealthScoreBreakdown health={healthBreakdown} />
         </section>
 
         {/* Top Performing Nodes */}

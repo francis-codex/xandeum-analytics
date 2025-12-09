@@ -135,3 +135,45 @@ export interface MetricsApiResponse {
   error?: string;
   timestamp: Date;
 }
+
+// Network Intelligence Types
+export interface NetworkEvent {
+  id: string;
+  type: 'info' | 'warning' | 'critical' | 'success';
+  category: 'storage' | 'network' | 'version' | 'performance' | 'capacity';
+  title: string;
+  message: string;
+  timestamp: Date;
+  metric?: string;
+  value?: number;
+  affectedNodes?: number;
+}
+
+export interface RiskAssessment {
+  atRiskCount: number;
+  atRiskNodes: PNode[];
+  criticalCount: number;
+  warningCount: number;
+  riskCategories: {
+    storage: number;
+    uptime: number;
+    version: number;
+    latency: number;
+  };
+}
+
+export interface VersionDistribution {
+  version: string;
+  count: number;
+  percentage: number;
+  isLatest: boolean;
+  nodes: PNode[];
+}
+
+export interface NetworkHealthBreakdown {
+  availability: number; // 0-100
+  versionHealth: number; // 0-100
+  distribution: number; // 0-100
+  storageHealth: number; // 0-100
+  totalScore: number; // 0-100
+}
