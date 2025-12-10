@@ -1,177 +1,253 @@
-import axios, { AxiosInstance } from 'axios';
+/**
+ * Xandeum pRPC Client
+ *
+ * Production-ready client for querying Xandeum pNode network
+ * with retry logic, load balancing, and graceful fallback
+ *
+ * Reference: https://docs.xandeum.network/api/pnode-rpc-prpc-reference
+ */
+
+import axios from 'axios';
 import type {
   PNode,
   NetworkStats,
   PNodeMetrics,
-  PNodeApiResponse,
-  NetworkStatsApiResponse,
-  MetricsApiResponse,
 } from '@/types/pnode';
-import { API_CONFIG, DEFAULT_NETWORK, NETWORK_TYPES } from './constants';
+import type {
+  JsonRpcRequest,
+  JsonRpcResponse,
+  PNodeStats,
+} from '@/types/prpc';
+import { PRpcMethod } from '@/types/prpc';
+import { getPRpcConfig } from './prpc-config';
+import { withRetry, RetryableError } from './retry-util';
+import { transformPNodeStats, transformNetworkStats } from './prpc-transformer';
 
 /**
- * pRPC Client for Xandeum Network Integration
- * Handles communication with pNode gossip network
+ * pRPC Client for Xandeum pNode Network
  */
 export class PNodeClient {
-  private client: AxiosInstance;
-  private network: typeof NETWORK_TYPES.MAINNET | typeof NETWORK_TYPES.DEVNET;
+  private config = getPRpcConfig();
+  private currentEndpointIndex = 0;
+  private requestIdCounter = 0;
 
-  constructor(network: typeof NETWORK_TYPES.MAINNET | typeof NETWORK_TYPES.DEVNET = DEFAULT_NETWORK) {
-    this.network = network;
-
-    const baseURL = network === NETWORK_TYPES.MAINNET
-      ? API_CONFIG.MAINNET_URL
-      : API_CONFIG.DEVNET_URL;
-
-    this.client = axios.create({
-      baseURL,
-      timeout: API_CONFIG.TIMEOUT,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    // Add request interceptor for logging
-    this.client.interceptors.request.use(
-      (config) => {
-        console.log(`[pRPC Request] ${config.method?.toUpperCase()} ${config.url}`);
-        return config;
-      },
-      (error) => {
-        console.error('[pRPC Request Error]', error);
-        return Promise.reject(error);
-      }
-    );
-
-    // Add response interceptor for error handling
-    this.client.interceptors.response.use(
-      (response) => {
-        console.log(`[pRPC Response] ${response.status} ${response.config.url}`);
-        return response;
-      },
-      (error) => {
-        // Suppress expected network errors during development (using mock data)
-        if (process.env.NODE_ENV === 'development') {
-          return Promise.reject(error);
-        }
-        console.error('[pRPC Response Error]', error.message);
-        if (error.response) {
-          console.error('Response data:', error.response.data);
-          console.error('Response status:', error.response.status);
-        }
-        return Promise.reject(error);
-      }
-    );
+  /**
+   * Get the next endpoint in round-robin fashion
+   */
+  private getNextEndpoint(): string {
+    const endpoint = this.config.endpoints[this.currentEndpointIndex];
+    this.currentEndpointIndex = (this.currentEndpointIndex + 1) % this.config.endpoints.length;
+    return endpoint;
   }
 
   /**
-   * Get all pNodes from the gossip network
+   * Extract IP address from endpoint URL
    */
-  async getAllPNodes(): Promise<PNode[]> {
+  private extractIp(endpoint: string): string {
+    return endpoint.match(/\d+\.\d+\.\d+\.\d+/)?.[0] || endpoint;
+  }
+
+  /**
+   * Make a JSON-RPC 2.0 request to a pNode
+   */
+  private async makeRpcRequest<T>(
+    method: PRpcMethod | string,
+    params?: any,
+    specificEndpoint?: string
+  ): Promise<T> {
+    const endpoint = specificEndpoint || this.getNextEndpoint();
+
+    const request: JsonRpcRequest = {
+      jsonrpc: '2.0',
+      id: ++this.requestIdCounter,
+      method,
+      params,
+    };
+
+    if (this.config.enableLogging) {
+      console.log(`[pRPC] → ${method} @ ${endpoint}`);
+    }
+
     try {
-      // TODO: Replace with actual pRPC endpoint from xandeum.network/docs
-      // This is a placeholder implementation
-      const response = await this.client.get<PNodeApiResponse>('/v1/pnodes');
+      const response = await withRetry(
+        async () => {
+          const axiosResponse = await axios.post<JsonRpcResponse<T>>(
+            endpoint,
+            request,
+            {
+              timeout: this.config.timeout,
+              headers: this.config.headers,
+            }
+          );
 
-      if (response.data.success && response.data.data) {
-        return response.data.data;
+          // Check for JSON-RPC errors in response
+          if (axiosResponse.data.error) {
+            throw new RetryableError(
+              `pRPC Error: ${axiosResponse.data.error.message}`,
+              new Error(JSON.stringify(axiosResponse.data.error))
+            );
+          }
+
+          return axiosResponse;
+        },
+        this.config.retry
+      );
+
+      if (this.config.enableLogging) {
+        console.log(`[pRPC] ✓ ${method} succeeded`);
       }
 
-      throw new Error(response.data.error || 'Failed to fetch pNodes');
+      if (!response.data.result) {
+        throw new Error('pRPC response missing result field');
+      }
+
+      return response.data.result;
     } catch (error) {
-      // Expected in development - using mock data
-      if (process.env.NODE_ENV === 'development') {
-        console.info('ℹ️ Using mock pNode data (pRPC not available)');
-      } else {
-        console.error('Error fetching all pNodes:', error);
+      if (this.config.enableLogging) {
+        console.warn(`[pRPC] ✗ ${method} failed:`, error instanceof Error ? error.message : error);
       }
-
-      // Return mock data for development
-      return this.getMockPNodes();
+      throw error;
     }
   }
 
   /**
-   * Get details for a specific pNode by public key
+   * Get statistics for a specific pNode
    */
-  async getPNodeDetails(publicKey: string): Promise<PNode | null> {
+  private async getPNodeStats(endpoint: string): Promise<PNode> {
     try {
-      // TODO: Replace with actual pRPC endpoint
-      const response = await this.client.get<{ success: boolean; data: PNode; error?: string }>(
-        `/v1/pnodes/${publicKey}`
+      const stats = await this.makeRpcRequest<PNodeStats>(
+        PRpcMethod.GET_STATS,
+        undefined,
+        endpoint
       );
 
-      if (response.data.success && response.data.data) {
-        return response.data.data;
-      }
-
-      throw new Error(response.data.error || 'Failed to fetch pNode details');
+      const ip = this.extractIp(endpoint);
+      return transformPNodeStats(stats, ip);
     } catch (error) {
-      // Expected in development - using mock data
-      if (process.env.NODE_ENV !== 'development') {
-        console.error(`Error fetching pNode details for ${publicKey}:`, error);
+      throw new Error(
+        `Failed to get stats from ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+
+  /**
+   * Get all pNodes from the network
+   * Queries each known pNode endpoint and aggregates results
+   */
+  async getAllPNodes(): Promise<PNode[]> {
+    try {
+      console.info('[pRPC] Fetching all pNodes from network...');
+
+      // Query all endpoints in parallel
+      const results = await Promise.allSettled(
+        this.config.endpoints.map(endpoint =>
+          this.getPNodeStats(endpoint)
+        )
+      );
+
+      // Extract successful results
+      const pnodes = results
+        .filter((result): result is PromiseFulfilledResult<PNode> =>
+          result.status === 'fulfilled'
+        )
+        .map(result => result.value);
+
+      // Log failures
+      const failures = results.filter(result => result.status === 'rejected');
+      if (failures.length > 0 && this.config.enableLogging) {
+        console.warn(`[pRPC] ${failures.length}/${this.config.endpoints.length} endpoints failed`);
       }
 
-      // Return mock data for development
-      const mockNodes = this.getMockPNodes();
-      return mockNodes.find(node => node.publicKey === publicKey) || null;
+      if (pnodes.length === 0) {
+        throw new Error('All pNode endpoints failed to respond');
+      }
+
+      console.info(`[pRPC] ✓ Successfully fetched ${pnodes.length} pNodes`);
+      return pnodes;
+    } catch (error) {
+      // Fallback to mock data in development
+      if (process.env.NODE_ENV === 'development') {
+        console.info('ℹ️ Using mock pNode data (pRPC query failed)');
+        return this.getMockPNodes();
+      }
+
+      console.error('Error fetching all pNodes:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get details for a specific pNode by public key or IP
+   */
+  async getPNodeDetails(identifier: string): Promise<PNode | null> {
+    try {
+      // Try to find endpoint by IP
+      const endpoint = this.config.endpoints.find(e => e.includes(identifier));
+
+      if (endpoint) {
+        return await this.getPNodeStats(endpoint);
+      }
+
+      // If not found, try to find by public key from all nodes
+      const allNodes = await this.getAllPNodes();
+      return allNodes.find(node =>
+        node.publicKey === identifier ||
+        node.ipAddress === identifier
+      ) || null;
+    } catch (error) {
+      // Fallback to mock data
+      if (process.env.NODE_ENV === 'development') {
+        const mockNodes = this.getMockPNodes();
+        return mockNodes.find(node =>
+          node.publicKey === identifier ||
+          node.ipAddress === identifier
+        ) || null;
+      }
+
+      console.error(`Error fetching pNode details for ${identifier}:`, error);
+      return null;
     }
   }
 
   /**
    * Get historical metrics for a specific pNode
+   * Note: This is not yet available in the pRPC API
+   * Returns mock data for now
    */
   async getPNodeMetrics(
     publicKey: string,
     timeframe: '24h' | '7d' | '30d' | '90d' = '24h'
   ): Promise<PNodeMetrics | null> {
-    try {
-      // TODO: Replace with actual pRPC endpoint
-      const response = await this.client.get<MetricsApiResponse>(
-        `/v1/pnodes/${publicKey}/metrics`,
-        { params: { timeframe } }
-      );
-
-      if (response.data.success && response.data.data) {
-        return response.data.data;
-      }
-
-      throw new Error(response.data.error || 'Failed to fetch pNode metrics');
-    } catch (error) {
-      // Expected in development - using mock data
-      if (process.env.NODE_ENV !== 'development') {
-        console.error(`Error fetching metrics for ${publicKey}:`, error);
-      }
-
-      // Return mock data for development
-      return this.getMockMetrics(publicKey, timeframe);
+    // TODO: Implement when Xandeum team releases historical metrics API
+    if (process.env.NODE_ENV === 'development') {
+      console.info('ℹ️ Historical metrics not yet available in pRPC - using mock data');
     }
+
+    return this.getMockMetrics(publicKey, timeframe);
   }
 
   /**
    * Get network-wide statistics
+   * Aggregates data from all pNodes
    */
   async getNetworkStats(): Promise<NetworkStats> {
     try {
-      // TODO: Replace with actual pRPC endpoint
-      const response = await this.client.get<NetworkStatsApiResponse>('/v1/network/stats');
+      console.info('[pRPC] Calculating network statistics...');
 
-      if (response.data.success && response.data.data) {
-        return response.data.data;
-      }
+      const allNodes = await this.getAllPNodes();
+      const networkStats = transformNetworkStats(allNodes);
 
-      throw new Error(response.data.error || 'Failed to fetch network stats');
+      console.info('[pRPC] ✓ Network stats calculated');
+      return networkStats;
     } catch (error) {
-      // Expected in development - using mock data
+      // Fallback to mock data in development
       if (process.env.NODE_ENV === 'development') {
-        console.info('ℹ️ Using mock network stats (pRPC not available)');
-      } else {
-        console.error('Error fetching network stats:', error);
+        console.info('ℹ️ Using mock network stats (pRPC query failed)');
+        return this.getMockNetworkStats();
       }
 
-      // Return mock data for development
-      return this.getMockNetworkStats();
+      console.error('Error fetching network stats:', error);
+      throw error;
     }
   }
 
@@ -185,7 +261,8 @@ export class PNodeClient {
 
       return allNodes.filter(node =>
         node.moniker.toLowerCase().includes(lowercaseQuery) ||
-        node.publicKey.toLowerCase().includes(lowercaseQuery)
+        node.publicKey.toLowerCase().includes(lowercaseQuery) ||
+        node.ipAddress.includes(lowercaseQuery)
       );
     } catch (error) {
       console.error('Error searching pNodes:', error);
@@ -206,7 +283,48 @@ export class PNodeClient {
     }
   }
 
-  // Mock data generators for development
+  /**
+   * Health check - test connectivity to pNode network
+   */
+  async healthCheck(): Promise<{
+    healthy: boolean;
+    availableEndpoints: number;
+    totalEndpoints: number;
+    responseTime: number;
+  }> {
+    const startTime = Date.now();
+
+    const results = await Promise.allSettled(
+      this.config.endpoints.map(async endpoint => {
+        try {
+          await this.makeRpcRequest<PNodeStats>(
+            PRpcMethod.GET_STATS,
+            undefined,
+            endpoint
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      })
+    );
+
+    const availableEndpoints = results.filter(
+      r => r.status === 'fulfilled' && r.value
+    ).length;
+
+    return {
+      healthy: availableEndpoints > 0,
+      availableEndpoints,
+      totalEndpoints: this.config.endpoints.length,
+      responseTime: Date.now() - startTime,
+    };
+  }
+
+  // ===========================================
+  // Mock Data Generators (Fallback)
+  // ===========================================
+
   private getMockPNodes(): PNode[] {
     const mockNodes: PNode[] = [];
     const countries = [
@@ -283,7 +401,7 @@ export class PNodeClient {
       availableStorage: totalStorage - usedStorage,
       avgUptime,
       decentralizationScore: 75 + Math.random() * 20,
-      networkVersion: 'v1.5.2',
+      networkVersion: 'v1.16.14-xandeum',
       avgLatency: mockNodes.reduce((sum, n) => sum + n.performance.avgLatency, 0) / mockNodes.length,
       totalBandwidth: mockNodes.reduce((sum, n) => sum + n.performance.bandwidthMbps, 0),
     };
@@ -328,11 +446,9 @@ let clientInstance: PNodeClient | null = null;
 /**
  * Get or create PNodeClient singleton instance
  */
-export function getPNodeClient(
-  network?: typeof NETWORK_TYPES.MAINNET | typeof NETWORK_TYPES.DEVNET
-): PNodeClient {
-  if (!clientInstance || (network && clientInstance['network'] !== network)) {
-    clientInstance = new PNodeClient(network);
+export function getPNodeClient(): PNodeClient {
+  if (!clientInstance) {
+    clientInstance = new PNodeClient();
   }
   return clientInstance;
 }

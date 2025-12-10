@@ -4,10 +4,14 @@ A comprehensive web-based analytics dashboard for Xandeum pNodes (storage provid
 
 ![Dashboard Preview](https://via.placeholder.com/1200x600/3b82f6/ffffff?text=Xandeum+pNode+Analytics)
 
+## 🎉 Status: **REAL pRPC INTEGRATION COMPLETE!**
+
+The platform now queries **live Xandeum pNode endpoints** using the official pRPC API.
+
 ## Features
 
 ### Core Functionality
-- **Real-time pNode Monitoring**: Live data updates every 30 seconds from the Xandeum gossip network
+- **Real-time pNode Monitoring**: Live data from 9 Xandeum pNode endpoints with automatic failover
 - **Network Overview Dashboard**: Comprehensive network statistics including total nodes, storage capacity, uptime, and decentralization scores
 - **Advanced Search & Filtering**: Search nodes by moniker, public key, or location with real-time filtering
 - **Performance Metrics**: Detailed tracking of uptime, latency, storage usage, and bandwidth

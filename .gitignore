@@ -40,3 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 COMPETITOR_ANALYSIS.md
+docs/PRPC_INTEGRATION_COMPLETE.md
