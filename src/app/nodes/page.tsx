@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAllPNodes, useNetworkStats } from "@/lib/hooks";
 import { NodeCard } from "@/components/NodeCard";
 import { ExportButtons } from "@/components/ExportButtons";
-import { LoadingPage } from "@/components/ui/loading";
+import { NetworkStatsGridSkeleton, NodeGridSkeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react";
@@ -93,9 +93,6 @@ export default function NodesPage() {
     }
   };
 
-  if (isLoading) {
-    return <LoadingPage message="Loading pNodes..." />;
-  }
 
   if (error) {
     return (
@@ -114,30 +111,30 @@ export default function NodesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-4 py-6">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">
-                Xandeum pNode Analytics
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+                XandScan
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 All pNodes on the network
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <nav className="flex gap-4">
+              <nav className="flex gap-2">
                 <Link href="/">
-                  <Button variant="ghost">Dashboard</Button>
+                  <Button variant="ghost" className="text-foreground hover:text-primary">Dashboard</Button>
                 </Link>
                 <Link href="/nodes">
-                  <Button variant="ghost">Nodes</Button>
+                  <Button variant="ghost" className="text-foreground hover:text-primary">Nodes</Button>
                 </Link>
               </nav>
               {nodes && stats && (
-                <div className="border-l pl-4 border-gray-200 dark:border-gray-800">
+                <div className="border-l pl-4 border-border">
                   <ExportButtons nodes={nodes} stats={stats} variant="compact" />
                 </div>
               )}
@@ -148,24 +145,32 @@ export default function NodesPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Search and Filters */}
-        <div className="mb-6 space-y-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by moniker, public key, or location..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        {isLoading ? (
+          <div className="space-y-6">
+            <div className="h-12 bg-muted rounded-lg animate-pulse"></div>
+            <div className="h-10 bg-muted rounded-lg animate-pulse"></div>
+            <NodeGridSkeleton count={12} />
           </div>
+        ) : (
+          <>
+            {/* Search and Filters */}
+            <div className="mb-6 space-y-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search by moniker, public key, or location..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
 
-          {/* Status Filters */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <SlidersHorizontal className="h-4 w-4 text-gray-400 mr-2" />
-            <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Status:</span>
+              {/* Status Filters */}
+              <div className="flex flex-wrap gap-2 items-center">
+                <SlidersHorizontal className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm text-muted-foreground mr-2">Status:</span>
             {(['all', 'active', 'inactive', 'syncing'] as StatusFilter[]).map((status) => (
               <Button
                 key={status}
@@ -182,10 +187,10 @@ export default function NodesPage() {
             ))}
           </div>
 
-          {/* Sort Options */}
-          <div className="flex flex-wrap gap-2 items-center">
-            <ArrowUpDown className="h-4 w-4 text-gray-400 mr-2" />
-            <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Sort by:</span>
+              {/* Sort Options */}
+              <div className="flex flex-wrap gap-2 items-center">
+                <ArrowUpDown className="h-4 w-4 text-muted-foreground mr-2" />
+                <span className="text-sm text-muted-foreground mr-2">Sort by:</span>
             {[
               { field: 'healthScore' as SortField, label: 'Health Score' },
               { field: 'uptime' as SortField, label: 'Uptime' },
@@ -206,31 +211,33 @@ export default function NodesPage() {
                     {sortDirection === 'asc' ? '↑' : '↓'}
                   </span>
                 )}
-              </Button>
-            ))}
-          </div>
-        </div>
+                  </Button>
+                ))}
+              </div>
+            </div>
 
-        {/* Results Count */}
-        <div className="mb-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Showing {filteredAndSortedNodes.length} of {nodes?.length || 0} nodes
-          </p>
-        </div>
+            {/* Results Count */}
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground">
+                Showing {filteredAndSortedNodes.length} of {nodes?.length || 0} nodes
+              </p>
+            </div>
 
-        {/* Nodes Grid */}
-        {filteredAndSortedNodes.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">
-              No nodes found matching your criteria
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredAndSortedNodes.map((node) => (
-              <NodeCard key={node.publicKey} node={node} />
-            ))}
-          </div>
+            {/* Nodes Grid */}
+            {filteredAndSortedNodes.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  No nodes found matching your criteria
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredAndSortedNodes.map((node) => (
+                  <NodeCard key={node.publicKey} node={node} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

@@ -1,38 +1,41 @@
-# Xandeum pNode Analytics Platform
+# XandScan - Xandeum pNode Explorer
 
-A comprehensive web-based analytics dashboard for Xandeum pNodes (storage provider nodes), providing real-time monitoring, performance metrics, and network insights.
+A modern, comprehensive network explorer and analytics platform for Xandeum pNodes (storage provider nodes). Monitor the decentralized storage network in real-time with beautiful visualizations and powerful insights.
 
-![Dashboard Preview](https://via.placeholder.com/1200x600/3b82f6/ffffff?text=Xandeum+pNode+Analytics)
+![XandScan Dashboard](https://via.placeholder.com/1200x600/6366f1/ffffff?text=XandScan+-+Xandeum+pNode+Explorer)
 
-## 🎉 Status: **REAL pRPC INTEGRATION COMPLETE!**
+## Status: LIVE & PRODUCTION READY
 
-The platform now queries **live Xandeum pNode endpoints** using the official pRPC API.
+XandScan queries live Xandeum pNode endpoints using the official pRPC API with real-time data updates every 30 seconds.
 
 ## Features
 
-### Core Functionality
-- **Real-time pNode Monitoring**: Live data from 9 Xandeum pNode endpoints with automatic failover
-- **Network Overview Dashboard**: Comprehensive network statistics including total nodes, storage capacity, uptime, and decentralization scores
-- **Advanced Search & Filtering**: Search nodes by moniker, public key, or location with real-time filtering
+### Core Explorer Functionality
+- **Live pNode Monitoring**: Real-time data from 9 Xandeum pNode endpoints with automatic failover
+- **Network Dashboard**: Comprehensive statistics including total nodes, storage capacity, uptime, and decentralization scores
+- **Advanced Search**: Search nodes by moniker, public key, or location with instant filtering
 - **Performance Metrics**: Detailed tracking of uptime, latency, storage usage, and bandwidth
 - **Historical Analytics**: 24h/7d/30d/90d performance trends with interactive charts
 
 ### Unique Features
-- **Health Score System**: Composite metric based on uptime, success rate, latency, and storage optimization
-- **Geographic Distribution**: View node locations across countries and regions
-- **Storage-Specific Analytics**: Monitor network-wide storage capacity and growth trends
-- **Top Performers Leaderboard**: Identify best-performing nodes by various metrics
-- **Responsive Design**: Full mobile and tablet support with dark mode
+- **Health Score System**: Composite metrics based on uptime, success rate, latency, and storage optimization
+- **Geographic Distribution**: Visualize node locations across countries and regions
+- **Storage Analytics**: Monitor network-wide capacity and growth trends
+- **Performance Leaderboard**: Identify top-performing nodes by various metrics
+- **Modern UI**: Beautiful interface with smooth animations, loading skeletons, and full dark mode support
+- **Fully Responsive**: Optimized for desktop, tablet, and mobile devices
+- **Data Export**: Export node and network data to CSV/JSON formats
 
 ## Tech Stack
 
-- **Framework**: Next.js 14+ (React 18, TypeScript)
-- **Styling**: Tailwind CSS with custom design system
-- **Data Fetching**: TanStack React Query (automatic caching, refetching, and state management)
-- **Charts**: Recharts for interactive data visualization
-- **State Management**: Zustand for UI state
-- **Date Handling**: date-fns for date formatting
-- **API Client**: Axios with interceptors for pRPC communication
+- **Framework**: Next.js 16 (React 19, TypeScript 5)
+- **Styling**: Tailwind CSS 4 with custom XandScan design system
+- **Data Fetching**: TanStack React Query v5 (automatic caching, refetching, and state management)
+- **Charts**: Recharts 3 for interactive data visualization
+- **State Management**: Zustand 5 for UI state
+- **Date Handling**: date-fns 4 for date formatting
+- **API Client**: Axios with interceptors and retry logic for pRPC communication
+- **Icons**: Lucide React for beautiful, consistent icons
 
 ## Quick Start
 
@@ -46,8 +49,8 @@ The platform now queries **live Xandeum pNode endpoints** using the official pRP
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-org/xandeum-analytics.git
-cd xandeum-analytics
+git clone https://github.com/your-org/xandscan.git
+cd xandscan
 ```
 
 2. Install dependencies:
@@ -81,7 +84,7 @@ yarn dev
 ## Project Structure
 
 ```
-xandeum-analytics/
+xandscan/
 ├── src/
 │   ├── app/                    # Next.js app directory
 │   │   ├── page.tsx           # Dashboard home page
@@ -283,14 +286,18 @@ npm run dev
 
 ## Roadmap
 
+- [x] Real-time pRPC integration
+- [x] Modern UI with loading states
+- [x] Dark mode support
+- [x] Mobile responsive design
+- [x] SEO optimization
+- [x] Data export (CSV/JSON)
+- [ ] WebSocket support for real-time updates
 - [ ] Network map visualization (geographic heatmap)
 - [ ] Alert system for node operators
 - [ ] Public API for third-party integrations
-- [ ] Leaderboard and gamification
 - [ ] ML-based capacity forecasting
 - [ ] Wallet integration for node operators
-- [ ] Email/webhook notifications
-- [ ] CSV/JSON data export
 
 ## License
 
@@ -298,19 +305,21 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 ## Support
 
-- Documentation: [docs/](./docs/)
-- Issues: [GitHub Issues](https://github.com/your-org/xandeum-analytics/issues)
-- Discord: [Xandeum Community](https://discord.gg/xandeum)
-- Website: https://xandeum.network
+- **Documentation**: [docs/](./docs/)
+- **Issues**: [GitHub Issues](https://github.com/your-org/xandscan/issues)
+- **Discord**: [Xandeum Community](https://discord.gg/uqRSmmM5m)
+- **Website**: https://xandeum.network
 
 ## Acknowledgments
 
-- Built with [Next.js](https://nextjs.org/)
-- Inspired by [stakewiz.com](https://stakewiz.com) and [validators.app](https://validators.app)
-- Powered by Xandeum network
+- Built with [Next.js](https://nextjs.org/) and modern React
+- Design inspired by leading blockchain explorers (Etherscan, Solscan)
+- Powered by the Xandeum pNode network
+- Created for the Xandeum pNode Analytics Bounty
 
 ---
 
+**Project**: XandScan - Xandeum pNode Explorer
 **Version**: 1.0.0
 **Last Updated**: December 2025
-**Maintainer**: Xandeum Team
+**Built By**: XandScan Team for Xandeum Labs

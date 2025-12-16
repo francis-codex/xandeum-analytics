@@ -132,7 +132,10 @@ export const SOCIAL_LINKS = {
 
 // Application metadata
 export const APP_METADATA = {
-  TITLE: 'Xandeum pNode Analytics',
-  DESCRIPTION: 'Real-time analytics and monitoring for Xandeum pNodes (storage provider nodes)',
+  TITLE: 'XandScan - Xandeum pNode Explorer',
+  DESCRIPTION: 'Real-time network explorer and analytics platform for Xandeum pNodes. Monitor storage provider nodes, track performance metrics, and explore the decentralized Xandeum storage network.',
   VERSION: '1.0.0',
+  KEYWORDS: 'Xandeum, pNode, blockchain explorer, storage network, analytics, Solana, decentralized storage',
+  OG_IMAGE: '/og-image.png', // We'll create this later
+  SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://xandscan.vercel.app',
 } as const;
