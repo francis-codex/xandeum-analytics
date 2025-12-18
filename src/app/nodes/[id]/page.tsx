@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from "react";
+import { useState, use } from "react";
 import Link from "next/link";
 import { usePNodeDetails, usePNodeMetrics } from "@/lib/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/StatusBadge";
 import { LoadingPage } from "@/components/ui/loading";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { PerformanceChart } from "@/components/PerformanceChart";
 import {
   formatBytes,
@@ -28,15 +27,19 @@ import {
 } from "lucide-react";
 
 interface NodeDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function NodeDetailPage({ params }: NodeDetailPageProps) {
   const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '90d'>('24h');
-  const { data: node, isLoading: nodeLoading, error: nodeError } = usePNodeDetails(params.id);
-  const { data: metrics, isLoading: metricsLoading } = usePNodeMetrics(params.id, timeframe);
+
+  // Unwrap the Promise params using React.use()
+  const { id } = use(params);
+
+  const { data: node, isLoading: nodeLoading, error: nodeError } = usePNodeDetails(id);
+  const { data: metrics, isLoading: metricsLoading } = usePNodeMetrics(id, timeframe);
 
   if (nodeLoading) {
     return <LoadingPage message="Loading pNode details..." />;

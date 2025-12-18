@@ -48,7 +48,8 @@ export class PNodeClient {
   }
 
   /**
-   * Make a JSON-RPC 2.0 request to a pNode
+   * Make a JSON-RPC 2.0 request to a pNode via our API proxy
+   * This avoids ERR_UNSAFE_PORT errors when browsers block port 6000
    */
   private async makeRpcRequest<T>(
     method: PRpcMethod | string,
@@ -65,18 +66,24 @@ export class PNodeClient {
     };
 
     if (this.config.enableLogging) {
-      console.log(`[pRPC] → ${method} @ ${endpoint}`);
+      console.log(`[pRPC] → ${method} via proxy (target: ${this.extractIp(endpoint)})`);
     }
 
     try {
       const response = await withRetry(
         async () => {
+          // Use our API proxy route instead of direct connection
+          // This bypasses browser security restrictions on port 6000
+          const proxyUrl = `/api/prpc?endpoint=${encodeURIComponent(endpoint)}`;
+
           const axiosResponse = await axios.post<JsonRpcResponse<T>>(
-            endpoint,
+            proxyUrl,
             request,
             {
               timeout: this.config.timeout,
-              headers: this.config.headers,
+              headers: {
+                'Content-Type': 'application/json',
+              },
             }
           );
 

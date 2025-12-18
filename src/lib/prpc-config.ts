@@ -55,7 +55,7 @@ export const DEFAULT_PRPC_CONFIG: PRpcClientConfig = {
   /** Custom headers for pRPC requests */
   headers: {
     'Content-Type': 'application/json',
-    'User-Agent': 'Xandeum-Analytics/1.0',
+    // Note: User-Agent header removed - browsers don't allow setting it from client-side code
   },
 
   /** Enable request/response logging in development */
