@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { formatBytes, formatPercentage, formatNumber } from "@/lib/utils";
 import { Server, HardDrive, Activity, Globe } from "lucide-react";
@@ -9,7 +10,7 @@ interface NetworkStatsProps {
   stats: NetworkStats;
 }
 
-export function NetworkStatsDisplay({ stats }: NetworkStatsProps) {
+export const NetworkStatsDisplay = memo(function NetworkStatsDisplay({ stats }: NetworkStatsProps) {
   const storageUsagePercentage = (stats.usedStorage / stats.totalStorage) * 100;
 
   const statCards = [
@@ -66,4 +67,4 @@ export function NetworkStatsDisplay({ stats }: NetworkStatsProps) {
       })}
     </div>
   );
-}
+});

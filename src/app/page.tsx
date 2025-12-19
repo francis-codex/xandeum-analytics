@@ -232,8 +232,6 @@ export default function Home() {
                 Live Data
               </span>
               <span>•</span>
-              <span>Updates every 30s</span>
-              <span>•</span>
               <span>Next.js + React Query</span>
             </div>
           </div>

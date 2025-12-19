@@ -38,11 +38,9 @@ export default function NodeDetailPage({ params }: NodeDetailPageProps) {
   // Unwrap the Promise params using React.use()
   const { id } = use(params);
 
-  // Decode the URL-encoded public key
-  const decodedId = decodeURIComponent(id);
-
-  const { data: node, isLoading: nodeLoading, error: nodeError } = usePNodeDetails(decodedId);
-  const { data: metrics, isLoading: metricsLoading } = usePNodeMetrics(decodedId, timeframe);
+  // ID is the IP address of the node
+  const { data: node, isLoading: nodeLoading, error: nodeError } = usePNodeDetails(id);
+  const { data: metrics, isLoading: metricsLoading } = usePNodeMetrics(id, timeframe);
 
   if (nodeLoading) {
     return <LoadingPage message="Loading pNode details..." />;

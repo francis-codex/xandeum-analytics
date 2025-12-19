@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { StatusBadge } from "./StatusBadge";
@@ -16,7 +17,7 @@ interface NodeCardProps {
   node: PNode;
 }
 
-export function NodeCard({ node }: NodeCardProps) {
+export const NodeCard = memo(function NodeCard({ node }: NodeCardProps) {
   const healthScoreColor =
     node.healthScore && node.healthScore >= 90
       ? "text-green-500"
@@ -25,7 +26,7 @@ export function NodeCard({ node }: NodeCardProps) {
       : "text-red-500";
 
   return (
-    <Link href={`/nodes/${encodeURIComponent(node.publicKey)}`}>
+    <Link href={`/nodes/${node.ipAddress}`}>
       <Card className="hover:shadow-lg transition-shadow cursor-pointer">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
@@ -112,4 +113,4 @@ export function NodeCard({ node }: NodeCardProps) {
       </Card>
     </Link>
   );
-}
+});
