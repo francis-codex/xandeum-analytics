@@ -20,8 +20,8 @@ import type {
 } from '@/types/prpc';
 import { PRpcMethod } from '@/types/prpc';
 import { getPRpcConfig } from './prpc-config';
-import { withRetry, RetryableError } from './retry-util';
 import { transformPNodeStats, transformNetworkStats } from './prpc-transformer';
+import { circuitBreaker } from './circuit-breaker';
 
 /**
  * pRPC Client for Xandeum pNode Network
@@ -65,54 +65,35 @@ export class PNodeClient {
       params,
     };
 
-    if (this.config.enableLogging) {
-      console.log(`[pRPC] → ${method} via proxy (target: ${this.extractIp(endpoint)})`);
-    }
-
     try {
-      const response = await withRetry(
-        async () => {
-          // Use our API proxy route instead of direct connection
-          // This bypasses browser security restrictions on port 6000
-          const proxyUrl = `/api/prpc?endpoint=${encodeURIComponent(endpoint)}`;
+      // Use our API proxy route instead of direct connection
+      // This bypasses browser security restrictions on port 6000
+      const proxyUrl = `/api/prpc?endpoint=${encodeURIComponent(endpoint)}`;
 
-          const axiosResponse = await axios.post<JsonRpcResponse<T>>(
-            proxyUrl,
-            request,
-            {
-              timeout: this.config.timeout,
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-
-          // Check for JSON-RPC errors in response
-          if (axiosResponse.data.error) {
-            throw new RetryableError(
-              `pRPC Error: ${axiosResponse.data.error.message}`,
-              new Error(JSON.stringify(axiosResponse.data.error))
-            );
-          }
-
-          return axiosResponse;
-        },
-        this.config.retry
+      const axiosResponse = await axios.post<JsonRpcResponse<T>>(
+        proxyUrl,
+        request,
+        {
+          timeout: this.config.timeout,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
 
-      if (this.config.enableLogging) {
-        console.log(`[pRPC] ✓ ${method} succeeded`);
+      // Check for JSON-RPC errors in response
+      if (axiosResponse.data.error) {
+        throw new Error(
+          `pRPC Error: ${axiosResponse.data.error.message}`
+        );
       }
 
-      if (!response.data.result) {
+      if (!axiosResponse.data.result) {
         throw new Error('pRPC response missing result field');
       }
 
-      return response.data.result;
+      return axiosResponse.data.result;
     } catch (error) {
-      if (this.config.enableLogging) {
-        console.warn(`[pRPC] ✗ ${method} failed:`, error instanceof Error ? error.message : error);
-      }
       throw error;
     }
   }
@@ -121,6 +102,11 @@ export class PNodeClient {
    * Get statistics for a specific pNode
    */
   private async getPNodeStats(endpoint: string): Promise<PNode> {
+    // Check circuit breaker - skip if node is known to be failing
+    if (circuitBreaker.isOpen(endpoint)) {
+      throw new Error(`Circuit breaker open for ${endpoint} (too many failures)`);
+    }
+
     try {
       const stats = await this.makeRpcRequest<PNodeStats>(
         PRpcMethod.GET_STATS,
@@ -129,8 +115,16 @@ export class PNodeClient {
       );
 
       const ip = this.extractIp(endpoint);
-      return transformPNodeStats(stats, ip);
+      const node = transformPNodeStats(stats, ip);
+
+      // Record success
+      circuitBreaker.recordSuccess(endpoint);
+
+      return node;
     } catch (error) {
+      // Record failure
+      circuitBreaker.recordFailure(endpoint);
+
       throw new Error(
         `Failed to get stats from ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
@@ -143,8 +137,6 @@ export class PNodeClient {
    */
   async getAllPNodes(): Promise<PNode[]> {
     try {
-      console.info('[pRPC] Fetching all pNodes from network...');
-
       // Query all endpoints in parallel
       const results = await Promise.allSettled(
         this.config.endpoints.map(endpoint =>
@@ -159,26 +151,18 @@ export class PNodeClient {
         )
         .map(result => result.value);
 
-      // Log failures
-      const failures = results.filter(result => result.status === 'rejected');
-      if (failures.length > 0 && this.config.enableLogging) {
-        console.warn(`[pRPC] ${failures.length}/${this.config.endpoints.length} endpoints failed`);
-      }
-
+      // Check if all endpoints failed
       if (pnodes.length === 0) {
         throw new Error('All pNode endpoints failed to respond');
       }
 
-      console.info(`[pRPC] ✓ Successfully fetched ${pnodes.length} pNodes`);
       return pnodes;
     } catch (error) {
       // Fallback to mock data in development
       if (process.env.NODE_ENV === 'development') {
-        console.info('ℹ️ Using mock pNode data (pRPC query failed)');
         return this.getMockPNodes();
       }
 
-      console.error('Error fetching all pNodes:', error);
       throw error;
     }
   }
@@ -211,7 +195,6 @@ export class PNodeClient {
         ) || null;
       }
 
-      console.error(`Error fetching pNode details for ${identifier}:`, error);
       return null;
     }
   }
@@ -226,10 +209,6 @@ export class PNodeClient {
     timeframe: '24h' | '7d' | '30d' | '90d' = '24h'
   ): Promise<PNodeMetrics | null> {
     // TODO: Implement when Xandeum team releases historical metrics API
-    if (process.env.NODE_ENV === 'development') {
-      console.info('ℹ️ Historical metrics not yet available in pRPC - using mock data');
-    }
-
     return this.getMockMetrics(publicKey, timeframe);
   }
 
@@ -239,21 +218,16 @@ export class PNodeClient {
    */
   async getNetworkStats(): Promise<NetworkStats> {
     try {
-      console.info('[pRPC] Calculating network statistics...');
-
       const allNodes = await this.getAllPNodes();
       const networkStats = transformNetworkStats(allNodes);
 
-      console.info('[pRPC] ✓ Network stats calculated');
       return networkStats;
     } catch (error) {
       // Fallback to mock data in development
       if (process.env.NODE_ENV === 'development') {
-        console.info('ℹ️ Using mock network stats (pRPC query failed)');
         return this.getMockNetworkStats();
       }
 
-      console.error('Error fetching network stats:', error);
       throw error;
     }
   }
@@ -272,7 +246,6 @@ export class PNodeClient {
         node.ipAddress.includes(lowercaseQuery)
       );
     } catch (error) {
-      console.error('Error searching pNodes:', error);
       return [];
     }
   }
@@ -285,7 +258,6 @@ export class PNodeClient {
       const allNodes = await this.getAllPNodes();
       return allNodes.filter(node => node.status === status);
     } catch (error) {
-      console.error(`Error fetching ${status} pNodes:`, error);
       return [];
     }
   }

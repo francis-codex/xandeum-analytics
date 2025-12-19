@@ -111,11 +111,6 @@ export async function withRetry<T>(
         config.backoffMultiplier
       );
 
-      console.warn(
-        `[Retry] Attempt ${attempt}/${config.maxRetries} failed. Retrying in ${delay}ms...`,
-        lastError.message
-      );
-
       await sleep(delay);
     }
   }
@@ -136,10 +131,17 @@ function isRetryableError(error: Error, config: RetryConfig): boolean {
     return true;
   }
 
-  // Network errors (timeouts, connection failures)
+  // DON'T retry connection refused or timeout errors (fail fast)
   if (
-    error.message.includes('timeout') ||
     error.message.includes('ECONNREFUSED') ||
+    error.message.includes('ECONNABORTED') ||
+    error.message.includes('timeout')
+  ) {
+    return false;
+  }
+
+  // Retry other network errors
+  if (
     error.message.includes('ETIMEDOUT') ||
     error.message.includes('ENOTFOUND') ||
     error.message.includes('Network Error')

@@ -13,16 +13,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            // Stale time: 30 seconds
-            staleTime: 30 * 1000,
+            // Stale time: 1 minute (data valid for 1 min without refetch)
+            staleTime: 60 * 1000,
             // Cache time: 5 minutes
             gcTime: 5 * 60 * 1000,
-            // Retry failed requests
-            retry: 3,
-            // Refetch on window focus
-            refetchOnWindowFocus: true,
-            // Refetch interval for real-time updates
-            refetchInterval: 30 * 1000,
+            // Don't retry failed requests (fail fast for performance)
+            retry: false,
+            // Disable refetch on window focus (prevents cascading requests)
+            refetchOnWindowFocus: false,
+            // Disable automatic refetch interval (user can manually refresh)
+            refetchInterval: false,
           },
         },
       })

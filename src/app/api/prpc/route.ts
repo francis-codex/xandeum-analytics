@@ -89,15 +89,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`[pRPC Proxy] → ${rpcRequest.method} @ ${endpoint}`);
-
     // Make the request to the pNode endpoint using axios
     // (fetch() blocks port 6000, but axios doesn't)
     const response = await axios.post<JsonRpcResponse>(
       endpoint,
       rpcRequest,
       {
-        timeout: 30000,
+        timeout: 5000, // Reduced from 30s to 5s for faster failures
         headers: {
           'Content-Type': 'application/json',
         },
@@ -107,7 +105,6 @@ export async function POST(request: NextRequest) {
 
     // Check for HTTP errors
     if (response.status !== 200) {
-      console.error(`[pRPC Proxy] ✗ ${rpcRequest.method} failed: HTTP ${response.status}`);
       return NextResponse.json(
         {
           jsonrpc: '2.0',
@@ -127,8 +124,6 @@ export async function POST(request: NextRequest) {
 
     const rpcResponse: JsonRpcResponse = response.data;
 
-    console.log(`[pRPC Proxy] ✓ ${rpcRequest.method} succeeded`);
-
     // Return the pNode response
     return NextResponse.json(rpcResponse, {
       status: 200,
@@ -138,8 +133,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('[pRPC Proxy] Error:', error);
-
     // Handle axios timeout errors
     if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       return NextResponse.json(
@@ -149,7 +142,7 @@ export async function POST(request: NextRequest) {
           error: {
             code: -32000,
             message: 'Request timeout',
-            data: { timeout: 30000 },
+            data: { timeout: 5000 },
           },
         } as JsonRpcResponse,
         { status: 504 }

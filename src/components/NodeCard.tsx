@@ -25,7 +25,7 @@ export function NodeCard({ node }: NodeCardProps) {
       : "text-red-500";
 
   return (
-    <Link href={`/nodes/${node.publicKey}`}>
+    <Link href={`/nodes/${encodeURIComponent(node.publicKey)}`}>
       <Card className="hover:shadow-lg transition-shadow cursor-pointer">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">

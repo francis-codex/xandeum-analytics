@@ -33,23 +33,16 @@ export const DEFAULT_PRPC_CONFIG: PRpcClientConfig = {
   /** List of pNode endpoints (load balanced round-robin) */
   endpoints: PNODE_ENDPOINTS,
 
-  /** Request timeout: 30 seconds */
-  timeout: 30000,
+  /** Request timeout: 5 seconds (fail fast for performance) */
+  timeout: 5000,
 
-  /** Retry configuration with exponential backoff */
+  /** Retry configuration - DISABLED for performance (fail fast) */
   retry: {
-    maxRetries: 3,
-    initialDelayMs: 1000,    // Start with 1 second
-    maxDelayMs: 10000,       // Cap at 10 seconds
-    backoffMultiplier: 2,    // Double delay each retry
-    retryableStatusCodes: [
-      408, // Request Timeout
-      429, // Too Many Requests
-      500, // Internal Server Error
-      502, // Bad Gateway
-      503, // Service Unavailable
-      504, // Gateway Timeout
-    ],
+    maxRetries: 0, // No retries - fail immediately
+    initialDelayMs: 0,
+    maxDelayMs: 0,
+    backoffMultiplier: 1,
+    retryableStatusCodes: [], // Don't retry any status codes
   },
 
   /** Custom headers for pRPC requests */
