@@ -136,28 +136,6 @@ services:
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Vercel Deployment</h2>
-        <p className="mb-4">Deploy to Vercel for optimal Next.js performance.</p>
-
-        <h3 className="text-lg font-semibold mb-3">Quick Deploy</h3>
-        <ol className="space-y-2 text-muted-foreground mb-6">
-          <li>1. Install Vercel CLI: <code className="bg-muted px-2 py-1 rounded text-xs">npm install -g vercel</code></li>
-          <li>2. Run <code className="bg-muted px-2 py-1 rounded text-xs">vercel</code> in project directory</li>
-          <li>3. Follow the prompts to link your project</li>
-          <li>4. Vercel auto-deploys from your main branch</li>
-        </ol>
-
-        <h3 className="text-lg font-semibold mb-3">Via Dashboard</h3>
-        <ol className="space-y-2 text-muted-foreground mb-6">
-          <li>1. Visit <a href="https://vercel.com/new" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">vercel.com/new</a></li>
-          <li>2. Import your Git repository</li>
-          <li>3. Vercel detects Next.js automatically</li>
-          <li>4. Add environment variables if needed</li>
-          <li>5. Deploy</li>
-        </ol>
-      </div>
-
-      <div>
         <h2 className="text-2xl font-semibold mb-4">Custom VPS/Server Deployment</h2>
         <p className="mb-4">Deploy on any Linux server with Node.js.</p>
 

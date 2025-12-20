@@ -127,18 +127,6 @@ docker run -p 3000:3000 -e NEXT_PUBLIC_APP_VERSION=1.0.0 xandscan
 3. Railway auto-detects Next.js and deploys
 4. Automatic HTTPS, custom domains, and CDN included
 
-### Vercel (Optimal Next.js Performance)
-
-```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Deploy
-vercel
-```
-
-Or use the Vercel dashboard at [vercel.com/new](https://vercel.com/new)
-
 ### Custom VPS/Server
 
 ```bash
