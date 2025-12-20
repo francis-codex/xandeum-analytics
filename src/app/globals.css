@@ -32,20 +32,20 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* XandScan Brand Colors - Dark Mode */
-    --background: #0f172a;
-    --foreground: #f1f5f9;
-    --primary: #818cf8;
-    --primary-foreground: #1e1b4b;
-    --secondary: #22d3ee;
-    --secondary-foreground: #164e63;
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    --accent: #a78bfa;
-    --accent-foreground: #2e1065;
-    --border: #334155;
-    --card: #1e293b;
-    --card-foreground: #f1f5f9;
+    /* XandScan Professional Dark Theme */
+    --background: #09090b;
+    --foreground: #e4e4e7;
+    --primary: #3b82f6;
+    --primary-foreground: #fafafa;
+    --secondary: #52525b;
+    --secondary-foreground: #fafafa;
+    --muted: #18181b;
+    --muted-foreground: #71717a;
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
+    --border: #27272a;
+    --card: #18181b;
+    --card-foreground: #e4e4e7;
   }
 }
 

@@ -1,56 +1,44 @@
-# XandScan - Xandeum pNode Explorer
+# XandScan - Xandeum pNode Network Explorer
 
-A modern, comprehensive network explorer and analytics platform for Xandeum pNodes (storage provider nodes). Monitor the decentralized storage network in real-time with beautiful visualizations and powerful insights.
+A comprehensive, production-ready network explorer and analytics platform for Xandeum pNodes (storage provider nodes). Built with Next.js 16, React 19, and TypeScript 5, XandScan delivers real-time monitoring, intelligent insights, and professional-grade analytics for the decentralized storage network.
 
-![XandScan Dashboard](https://via.placeholder.com/1200x600/6366f1/ffffff?text=XandScan+-+Xandeum+pNode+Explorer)
+## Live Status
 
-## Status: LIVE & PRODUCTION READY
+**PRODUCTION READY** - Currently monitoring **8 live Xandeum pNode endpoints** via pRPC API (port 6000) with optimized performance, intelligent caching, and automatic failover.
 
-XandScan queries **9 verified live Xandeum pNode endpoints** using the official pRPC API with optimized performance (6-7s load time) and intelligent caching. All data is real-time and verified through circuit breaker health checks.
+## Table of Contents
 
-**Quality Over Quantity**: We focus on deep analytics from nodes with open pRPC ports rather than listing all registered nodes. Every metric is live, verified, and actionable.
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+- [Deployment](#deployment)
+- [Usage Guide](#usage-guide)
+- [Technical Architecture](#technical-architecture)
+- [API Integration](#api-integration)
+- [Performance](#performance)
+- [Contributing](#contributing)
+- [Support](#support)
 
 ## Features
 
-### Core Explorer Functionality
-- **Live pNode Monitoring**: Real-time data from 9 Xandeum pNode endpoints with automatic failover
-- **Network Dashboard**: Comprehensive statistics including total nodes, storage capacity, uptime, and decentralization scores
-- **Advanced Search**: Search nodes by moniker, public key, or location with instant filtering
-- **Performance Metrics**: Detailed tracking of uptime, latency, storage usage, and bandwidth
-- **Historical Analytics**: 24h/7d/30d/90d performance trends with interactive charts
+### Core Capabilities
 
-### Unique Features
-- **Network Health Grading**: A-F letter grade system with composite scoring (uptime, active nodes, storage, latency, decentralization)
-- **Intelligence Layer**: AI-powered insights with real-time network event detection and risk assessment
-- **Health Score System**: Composite metrics based on uptime, success rate, latency, and storage optimization
-- **Geographic Distribution**: Interactive world map showing node distribution by country with rankings and metrics
-- **Top Performers Leaderboard**: Highlight best nodes across uptime, storage capacity, and latency categories
-- **Version Intelligence**: Track version distribution and upgrade trends across the network
-- **Live Status Indicators**: Real-time pulse animations showing active data streaming
-- **At-Risk Nodes Tracking**: Proactive monitoring of nodes requiring attention with categorized risk levels
-- **Modern UI**: Beautiful interface with smooth animations, loading skeletons, and full dark mode support
-- **Fully Responsive**: Optimized for desktop, tablet, and mobile devices
-- **Data Export**: Export node and network data to CSV/JSON formats
+- **Live pNode Monitoring**: Real-time data from 8 verified endpoints with automatic failover and circuit breaker protection
+- **Network Health Grading**: A-F letter grade system with weighted composite scoring optimized for storage networks
+- **Intelligence Layer**: AI-powered insights detecting network events, risks, and performance trends
+- **Geographic Analytics**: Interactive visualizations showing node distribution across countries with detailed metrics
+- **Performance Tracking**: Historical trends, charts, and comprehensive health score breakdowns
+- **Advanced Search**: Multi-field search with real-time filtering by moniker, public key, location, and status
+- **Data Export**: Export network and node data to CSV/JSON formats for offline analysis
+- **Professional UI**: Dark mode support, loading skeletons, and fully responsive design
 
-## Tech Stack
+### Unique Differentiators
 
-- **Framework**: Next.js 16.1+ (React 19, TypeScript 5)
-- **Styling**: Tailwind CSS 4 with custom XandScan design system
-- **Data Fetching**: TanStack React Query v5 (optimized caching, no auto-refetch)
-- **Charts**: Recharts 3 for interactive data visualization
-- **Date Handling**: date-fns 4 for date formatting
-- **API Client**: Axios with circuit breaker pattern for pRPC communication
-- **Icons**: Lucide React for beautiful, consistent icons
-
-### Performance Features
-- **5-second timeout** - Fast failure detection
-- **Circuit Breaker Pattern** - Automatically skips failing nodes to prevent cascading delays
-- **React.memo Optimization** - Prevents unnecessary re-renders on expensive components
-- **No Retry Logic** - Fail fast strategy for better UX and faster load times
-- **Tree Shaking** - Removed unused dependencies for smaller bundle size
-- **Zero Vulnerabilities** - Latest secure dependencies with no npm audit warnings
-- **Parallel Data Fetching** - Queries 9 pNode endpoints simultaneously
-- **Smart Caching** - 60-second stale time prevents excessive network requests
+- **Storage-First Scoring**: Health metrics weighted for Xandeum's exabyte-scale storage mission (60% combined weight on storage and availability)
+- **Circuit Breaker Pattern**: Intelligent failover prevents cascading delays from unresponsive nodes
+- **Version Intelligence**: Track software version distribution and upgrade trends across the network
+- **At-Risk Node Detection**: Proactive monitoring with categorized risk levels and actionable insights
+- **Zero Auto-Refetch**: Smart caching strategy prevents excessive network requests while maintaining data freshness
 
 ## Quick Start
 
@@ -58,43 +46,293 @@ XandScan queries **9 verified live Xandeum pNode endpoints** using the official 
 
 - Node.js 20.x or higher
 - npm or yarn package manager
-- Access to Xandeum network (mainnet or devnet)
+- Git for repository cloning
 
-### Installation
+### Installation (5 minutes)
 
-1. Clone the repository:
 ```bash
+# 1. Clone repository
 git clone https://github.com/your-org/xandscan.git
 cd xandscan
-```
 
-2. Install dependencies:
-```bash
+# 2. Install dependencies
 npm install
-# or
-yarn install
+
+# 3. Run development server
+npm run dev
 ```
 
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
+Open [http://localhost:3000](http://localhost:3000) - XandScan is now running with live pNode data.
 
-Edit `.env.local` and configure:
+### Environment Configuration (Optional)
+
+Create `.env.local` to customize:
+
 ```env
-NEXT_PUBLIC_XANDEUM_RPC_URL=https://api.xandeum.network
-NEXT_PUBLIC_XANDEUM_DEVNET_RPC_URL=https://devnet.xandeum.network
 NEXT_PUBLIC_APP_VERSION=1.0.0
 ```
 
-4. Run the development server:
+Note: XandScan uses hardcoded pNode endpoints by default. No additional configuration required.
+
+### Production Build
+
 ```bash
-npm run dev
-# or
-yarn dev
+npm run build
+npm run start
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+Production builds include:
+- TypeScript compilation
+- Code splitting and tree shaking
+- CSS minification
+- Static page generation
+- Bundle optimization
+
+## Documentation
+
+Comprehensive documentation is available at `/docs` when running XandScan:
+
+### Getting Started
+- **Introduction** - Overview and key features
+- **Quick Start** - Installation and first deployment
+
+### User Guides
+- **Platform Guide** - Complete feature walkthrough
+- **Understanding Metrics** - Health scores and performance calculations
+
+### Platform
+- **Deployment** - Docker, Railway, Vercel, and VPS deployment guides
+- **Architecture** - Technical design and data flow
+
+### API & Integration
+- **API Reference** - Complete type definitions and React Query hooks
+- **Integration Guide** - Practical examples for custom features
+
+## Deployment
+
+### Docker (Recommended for Production)
+
+```bash
+# Build image
+docker build -t xandscan .
+
+# Run container
+docker run -p 3000:3000 -e NEXT_PUBLIC_APP_VERSION=1.0.0 xandscan
+```
+
+### Railway (Zero Configuration)
+
+1. Visit [railway.app](https://railway.app)
+2. Create new project from GitHub repository
+3. Railway auto-detects Next.js and deploys
+4. Automatic HTTPS, custom domains, and CDN included
+
+### Vercel (Optimal Next.js Performance)
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+vercel
+```
+
+Or use the Vercel dashboard at [vercel.com/new](https://vercel.com/new)
+
+### Custom VPS/Server
+
+```bash
+# Install PM2 process manager
+npm install -g pm2
+
+# Build and start
+npm run build
+pm2 start npm --name "xandscan" -- start
+pm2 startup
+pm2 save
+```
+
+Configure Nginx reverse proxy:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+For detailed deployment instructions, see [docs/platform/deployment](/docs/platform/deployment).
+
+## Usage Guide
+
+### Dashboard
+
+The main dashboard provides:
+- **Network Health Grade**: A-F scoring based on uptime, storage, latency, and decentralization
+- **Network Statistics**: Total nodes, storage capacity, average uptime, and decentralization metrics
+- **Intelligence Panel**: AI-powered insights detecting critical events and network trends
+- **Health Score Breakdown**: Weighted scoring showing storage (30%), availability (30%), version (25%), and distribution (15%)
+- **Geographic Distribution**: Node counts and health metrics by country
+- **Top Performers**: Leaderboards for highest uptime, most storage, and lowest latency
+
+### Node Exploration
+
+Navigate to `/nodes` to:
+- **Search**: Find nodes by moniker, public key, city, or country
+- **Filter**: Show only active, inactive, or syncing nodes
+- **Sort**: Order by health score, uptime, storage usage, latency, or name
+- **View Details**: Click any node for comprehensive metrics and historical charts
+
+### Understanding Health Scores
+
+XandScan uses storage-optimized scoring:
+
+**Formula**: Health Score = (Storage × 30%) + (Availability × 30%) + (Version × 25%) + (Distribution × 15%)
+
+**Score Components**:
+- **Storage Health (30%)**: Optimal utilization at 60-80% capacity
+- **Availability (30%)**: Percentage of nodes providing active storage access
+- **Version Health (25%)**: Nodes running latest software for compatibility
+- **Distribution (15%)**: Geographic diversity across countries and regions
+
+**Grade Ranges**:
+- A+/A (90-100): Excellent - Network performing optimally
+- B (70-89): Good - Minor improvements recommended
+- C (50-69): Fair - Monitoring and optimization needed
+- D/F (<50): Poor - Critical issues require immediate attention
+
+### Data Export
+
+Export network data for analysis:
+- **CSV Format**: Compatible with Excel, Google Sheets, and data analysis tools
+- **JSON Format**: For scripts, APIs, and custom applications
+- **Network Stats**: Complete network overview with all metrics
+- **Filtered Nodes**: Export search results and filtered node lists
+
+## Technical Architecture
+
+### Tech Stack
+
+**Frontend**
+- Next.js 16.1+ (React 19, App Router, Server Components)
+- TypeScript 5 (strict mode, full type safety)
+- Tailwind CSS 4 (utility-first, dark mode)
+- TanStack React Query v5 (server state, caching)
+- Recharts 3 (data visualization)
+
+**Data Layer**
+- pRPC API Integration (port 6000 endpoints)
+- Axios with circuit breaker pattern
+- 5-second timeout per request
+- 60-second cache stale time
+- No automatic background refetch
+
+**Performance**
+- React.memo for expensive components
+- useMemo for complex calculations
+- Parallel endpoint querying
+- Route-based code splitting
+- Tree shaking and bundle optimization
+
+### Data Flow
+
+```
+User → Component → React Query Hook → PNodeClient → Circuit Breaker → 8 pRPC Endpoints
+                       ↓                                                       ↓
+                   Cache (60s) ←──── Data Transform ←───── pRPC Response
+                       ↓
+                   Component Render
+```
+
+### Key Design Principles
+
+- **Fail Fast**: 5-second timeout, no retry logic
+- **Resilience**: Circuit breaker skips failing nodes
+- **Performance**: Parallel fetching, smart caching
+- **User Experience**: Loading states, error boundaries, responsive design
+- **Maintainability**: TypeScript, modular architecture, comprehensive documentation
+
+## API Integration
+
+### React Query Hooks
+
+```typescript
+import { useAllPNodes, useNetworkStats } from '@/lib/hooks';
+
+function Dashboard() {
+  const { data: nodes, isLoading, error } = useAllPNodes();
+  const { data: stats } = useNetworkStats();
+
+  return (
+    <div>
+      <h2>Total Nodes: {stats?.totalNodes}</h2>
+      <h2>Active: {stats?.activeNodes}</h2>
+    </div>
+  );
+}
+```
+
+### PNode Data Structure
+
+```typescript
+interface PNode {
+  publicKey: string;
+  moniker: string;
+  ipAddress: string;
+  version: string;
+  status: 'active' | 'inactive' | 'syncing';
+  uptime: number;
+  storage: {
+    used: number;
+    total: number;
+    available: number;
+    usagePercentage: number;
+  };
+  performance: {
+    avgLatency: number;
+    successRate: number;
+    bandwidthMbps: number;
+  };
+  location: {
+    country: string;
+    countryCode: string;
+    city: string;
+    lat: number;
+    lng: number;
+  };
+  healthScore: number;
+}
+```
+
+For complete API documentation, see [docs/api/reference](/docs/api/reference).
+
+## Performance
+
+### Metrics
+
+- **Initial Load**: 6-7 seconds (live data from 8 endpoints)
+- **Subsequent Loads**: <1 second (cached data)
+- **Node Detail Page**: 2-3 seconds
+- **Bundle Size**: Optimized with code splitting
+- **Mobile Responsiveness**: 100% compatible
+
+### Optimizations
+
+- Circuit breaker prevents slow endpoints from blocking UI
+- Parallel fetching queries all 8 endpoints simultaneously
+- 60-second cache prevents excessive network requests
+- React.memo reduces unnecessary re-renders
+- Tree shaking eliminates unused code
+- Route-based lazy loading reduces initial bundle size
 
 ## Project Structure
 
@@ -102,234 +340,92 @@ yarn dev
 xandscan/
 ├── src/
 │   ├── app/                    # Next.js app directory
-│   │   ├── page.tsx           # Dashboard home page
-│   │   ├── nodes/
-│   │   │   ├── page.tsx       # Node list page
-│   │   │   └── [id]/
-│   │   │       └── page.tsx   # Individual node detail
-│   │   ├── layout.tsx         # Root layout
-│   │   └── globals.css        # Global styles
+│   │   ├── docs/              # Documentation pages
+│   │   │   ├── guides/        # User guides
+│   │   │   ├── platform/      # Platform documentation
+│   │   │   └── api/           # API reference
+│   │   ├── nodes/             # Node list and details
+│   │   ├── api/               # API routes (pRPC proxy)
+│   │   └── page.tsx           # Dashboard
 │   ├── components/            # React components
-│   │   ├── ui/               # Reusable UI components
-│   │   │   ├── card.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── button.tsx
-│   │   │   └── loading.tsx
-│   │   ├── NodeCard.tsx      # pNode card component
-│   │   ├── NetworkStats.tsx  # Network statistics display
-│   │   ├── StatusBadge.tsx   # Status indicator
-│   │   └── PerformanceChart.tsx # Chart component
-│   ├── lib/                   # Utilities and helpers
-│   │   ├── pnode-client.ts   # pRPC API client
-│   │   ├── hooks.ts          # React Query hooks
-│   │   ├── providers.tsx     # React Query provider
-│   │   ├── utils.ts          # Utility functions
-│   │   └── constants.ts      # App constants
-│   └── types/                 # TypeScript types
-│       └── pnode.ts          # pNode type definitions
+│   │   ├── ui/                # Reusable UI components
+│   │   ├── Header.tsx         # Shared navigation
+│   │   ├── DocsSidebar.tsx    # Documentation sidebar
+│   │   ├── NetworkStats.tsx   # Statistics display
+│   │   └── NodeCard.tsx       # Node card component
+│   ├── lib/                   # Core libraries
+│   │   ├── pnode-client.ts    # pRPC API client
+│   │   ├── hooks.ts           # React Query hooks
+│   │   ├── intelligence.ts    # AI analytics
+│   │   ├── export.ts          # Data export utilities
+│   │   └── constants.ts       # App constants
+│   └── types/                 # TypeScript definitions
+│       └── pnode.ts           # pNode types
+├── docs/                      # Markdown documentation (reference)
 ├── public/                    # Static assets
-├── docs/                      # Documentation
-│   ├── API.md               # API integration guide
-│   ├── FEATURES.md          # Feature documentation
-│   └── DEPLOYMENT.md        # Deployment guide
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-└── next.config.ts
+└── package.json
 ```
 
-## Usage
+## Contributing
 
-### Dashboard Home
-The main dashboard provides:
-- Network-wide statistics (total nodes, storage capacity, uptime)
-- Top 8 performing nodes by health score
-- Quick navigation to node list
+Contributions are welcome! Please follow these guidelines:
 
-### Node List Page
-Features include:
-- Search by moniker, public key, or location
-- Filter by status (active/inactive/syncing)
-- Sort by health score, uptime, storage, latency, or name
-- Real-time node count by status
-- Grid view of all nodes with key metrics
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Node Detail Page
-Detailed view of individual nodes:
-- Comprehensive node information (IP, location, version)
-- Real-time performance metrics
-- Historical charts (uptime, latency, storage, bandwidth)
-- Staking information (if applicable)
-- Health score breakdown
+### Development Guidelines
 
-## API Integration
-
-The platform integrates with the Xandeum pRPC (pNode RPC) API to fetch real-time data from the gossip network.
-
-### Key API Endpoints
-
-```typescript
-// Get all pNodes
-GET /v1/pnodes
-
-// Get specific pNode details
-GET /v1/pnodes/{publicKey}
-
-// Get pNode metrics
-GET /v1/pnodes/{publicKey}/metrics?timeframe=24h
-
-// Get network statistics
-GET /v1/network/stats
-```
-
-See [docs/API.md](./docs/API.md) for detailed integration guide.
-
-### Mock Data for Development
-
-The application includes mock data generators for development when the actual pRPC endpoints are not available. This allows you to:
-- Test the UI without a live backend
-- Develop features in parallel with backend development
-- Demo the platform with realistic data
-
-## Deployment
-
-The platform can be deployed using various methods:
-
-### Docker
-
-Build and run with Docker:
-
-```bash
-# Build image
-docker build -t xandeum-analytics .
-
-# Run container
-docker run -p 3000:3000 \
-  -e NEXT_PUBLIC_APP_VERSION=1.0.0 \
-  xandeum-analytics
-```
-
-### Docker Compose
-
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_APP_VERSION=1.0.0
-      - NODE_ENV=production
-```
-
-### Production Deployment
-
-For production deployment, ensure you configure the environment variables properly. See [.env.example](./.env.example) for required configuration.
-
-## Performance Optimization
-
-- **Server-Side Rendering**: Critical pages use SSR for fast initial load
-- **Data Caching**: React Query caches data for 5 minutes, refetches every 30 seconds
-- **Code Splitting**: Automatic route-based code splitting
-- **Image Optimization**: Next.js Image component for optimized images
-- **Bundle Analysis**: Run `npm run build` to analyze bundle size
-
-### Performance Metrics
-- Initial load: 6-7s (optimized from 2+ minutes)
-- Subsequent loads: <1s (cached)
-- Node detail page: 2-3s
-- Zero production console logs
-- Mobile responsiveness: 100%
-
-## Development
-
-### Available Scripts
-
-```bash
-npm run dev      # Start development server
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
-```
-
-### Code Quality
-
-- TypeScript strict mode enabled
-- ESLint for code linting
-- Prettier for code formatting (recommended)
-
-## Architecture
-
-### Data Flow
-
-```
-pRPC API → PNodeClient → React Query → Components → UI
-```
-
-1. **PNodeClient**: Axios-based wrapper for pRPC endpoints with error handling
-2. **React Query Hooks**: Custom hooks for data fetching with automatic caching
-3. **Components**: Presentational components that consume hooks
-4. **UI**: Rendered with Tailwind CSS and custom design system
-
-### State Management
-
-- **Server State**: React Query (API data, caching - 60s stale time)
-- **UI State**: React useState/useReducer (search, filters, sort)
-- **Circuit Breaker**: Tracks failing nodes to prevent repeated requests
-
-## Troubleshooting
-
-### Common Issues
-
-**Development server won't start**
-```bash
-rm -rf .next node_modules
-npm install
-npm run dev
-```
-
-**API connection issues**
-- Verify `NEXT_PUBLIC_XANDEUM_RPC_URL` is set correctly
-- Check network connectivity
-- Review browser console for CORS errors
-
-## Roadmap
-
-- [x] Real-time pRPC integration
-- [x] Modern UI with loading states
-- [x] Dark mode support
-- [x] Mobile responsive design
-- [x] SEO optimization
-- [x] Data export (CSV/JSON)
-- [ ] WebSocket support for real-time updates
-- [ ] Network map visualization (geographic heatmap)
-- [ ] Alert system for node operators
-- [ ] Public API for third-party integrations
-- [ ] ML-based capacity forecasting
-- [ ] Wallet integration for node operators
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details
+- Follow TypeScript strict mode
+- Use Tailwind CSS for styling (no inline styles)
+- Write tests for new features
+- Update documentation for API changes
+- No emojis in code, docs, or README (professional presentation)
 
 ## Support
 
-- **Documentation**: [docs/](./docs/)
-- **Issues**: [GitHub Issues](https://github.com/your-org/xandscan/issues)
-- **Discord**: [Xandeum Community](https://discord.gg/uqRSmmM5m)
-- **Website**: https://xandeum.network
+### Resources
+
+- **Documentation**: [/docs](/docs) - Complete platform documentation
+- **GitHub Issues**: [Report bugs or request features](https://github.com/your-org/xandscan/issues)
+- **Xandeum Discord**: [Join community](https://discord.gg/uqRSmmM5m)
+- **Website**: [xandeum.network](https://xandeum.network)
+
+### Common Issues
+
+**Port 3000 in use**
+```bash
+PORT=3001 npm run dev
+```
+
+**Module not found**
+```bash
+rm -rf node_modules .next
+npm install
+```
+
+**Data not loading**
+- Check internet connection
+- Verify firewall allows port 6000 connections
+- Check browser console for errors
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
-- Built with [Next.js](https://nextjs.org/) and modern React
-- Design inspired by leading blockchain explorers (Etherscan, Solscan)
+- Built with [Next.js](https://nextjs.org/) and modern React ecosystem
 - Powered by the Xandeum pNode network
 - Created for the Xandeum pNode Analytics Bounty
+- Design inspired by professional blockchain explorers
 
 ---
 
-**Project**: XandScan - Xandeum pNode Explorer
+**Project**: XandScan - Xandeum pNode Network Explorer
 **Version**: 1.0.0
+**Status**: Production Ready
 **Last Updated**: December 2025
 **Built By**: XandScan Team for Xandeum Labs

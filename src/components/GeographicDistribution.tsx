@@ -66,33 +66,29 @@ export const GeographicDistribution = memo(function GeographicDistribution({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Globe className="h-5 w-5 text-primary" />
+          <Globe className="h-5 w-5 text-foreground" />
           Geographic Distribution
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         {/* Summary Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-primary/5 rounded-lg p-3">
-            <div className="text-2xl font-bold text-primary">{totalCountries}</div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="bg-muted rounded-lg p-3">
+            <div className="text-2xl font-bold text-foreground">{totalCountries}</div>
             <div className="text-xs text-muted-foreground">Countries</div>
           </div>
           {topCountry && (
-            <div className="bg-secondary/5 rounded-lg p-3">
-              <div className="text-2xl font-bold text-secondary">{topCountry.count}</div>
+            <div className="bg-muted rounded-lg p-3">
+              <div className="text-2xl font-bold text-foreground">{topCountry.count}</div>
               <div className="text-xs text-muted-foreground">in {topCountry.country}</div>
             </div>
           )}
         </div>
 
         {/* Country List */}
-        <div className="space-y-3 max-h-[400px] overflow-y-auto">
+        <div className="space-y-2.5 max-h-[400px] overflow-y-auto pr-1">
           {countryData.map((data, index) => {
-            const healthColor =
-              data.avgHealth >= 90 ? 'text-green-500' :
-              data.avgHealth >= 75 ? 'text-blue-500' :
-              data.avgHealth >= 60 ? 'text-yellow-500' :
-              'text-orange-500';
+            const healthColor = 'text-muted-foreground';
 
             return (
               <div
@@ -100,44 +96,41 @@ export const GeographicDistribution = memo(function GeographicDistribution({
                 className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-primary transition-colors"
               >
                 {/* Rank Badge */}
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold ${
-                  index === 0 ? 'bg-yellow-500 text-white' :
-                  index === 1 ? 'bg-gray-400 text-white' :
-                  index === 2 ? 'bg-orange-600 text-white' :
-                  'bg-muted text-muted-foreground'
-                }`}>
+                <div className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold bg-muted text-muted-foreground">
                   {index + 1}
                 </div>
 
                 {/* Country Info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     <span className="font-semibold text-foreground truncate">
                       {data.country}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
                       ({data.countryCode})
                     </span>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-muted rounded-full h-2 mb-1">
+                  <div className="w-full bg-muted rounded-full h-1.5 mb-1.5">
                     <div
-                      className="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all"
+                      className="bg-primary h-1.5 rounded-full transition-all"
                       style={{ width: `${data.percentage}%` }}
                     />
                   </div>
 
                   {/* Stats Row */}
-                  <div className="flex items-center gap-3 text-xs">
-                    <span className="text-muted-foreground">
-                      {data.count} nodes ({data.percentage.toFixed(1)}%)
+                  <div className="flex items-center gap-2 text-xs flex-wrap">
+                    <span className="text-muted-foreground whitespace-nowrap">
+                      {data.count} nodes
                     </span>
-                    <span className="text-green-500">
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-muted-foreground whitespace-nowrap">
                       {data.activeCount} active
                     </span>
-                    <span className={healthColor}>
+                    <span className="text-muted-foreground">•</span>
+                    <span className={`${healthColor} whitespace-nowrap`}>
                       {data.avgHealth.toFixed(0)}% health
                     </span>
                   </div>

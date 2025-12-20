@@ -31,7 +31,7 @@ export const TopPerformers = memo(function TopPerformers({ nodes }: TopPerformer
       {
         title: 'Highest Uptime',
         icon: Activity,
-        color: 'text-green-500',
+        color: 'text-foreground',
         nodes: activeNodes
           .sort((a, b) => b.uptime - a.uptime)
           .slice(0, 3)
@@ -44,7 +44,7 @@ export const TopPerformers = memo(function TopPerformers({ nodes }: TopPerformer
       {
         title: 'Most Storage',
         icon: HardDrive,
-        color: 'text-blue-500',
+        color: 'text-foreground',
         nodes: activeNodes
           .sort((a, b) => b.storage.total - a.storage.total)
           .slice(0, 3)
@@ -57,7 +57,7 @@ export const TopPerformers = memo(function TopPerformers({ nodes }: TopPerformer
       {
         title: 'Lowest Latency',
         icon: Zap,
-        color: 'text-yellow-500',
+        color: 'text-foreground',
         nodes: activeNodes
           .sort((a, b) => a.performance.avgLatency - b.performance.avgLatency)
           .slice(0, 3)
@@ -78,7 +78,7 @@ export const TopPerformers = memo(function TopPerformers({ nodes }: TopPerformer
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-yellow-500" />
+          <Trophy className="h-5 w-5 text-foreground" />
           Top Performers
         </CardTitle>
       </CardHeader>
@@ -98,11 +98,11 @@ export const TopPerformers = memo(function TopPerformers({ nodes }: TopPerformer
 
                 <div className="space-y-2">
                   {category.nodes.map((item, rank) => {
-                    const medals = ['🥇', '🥈', '🥉'];
+                    const rankLabels = ['#1', '#2', '#3'];
                     const bgColors = [
-                      'bg-yellow-500/10 border-yellow-500/30',
-                      'bg-gray-400/10 border-gray-400/30',
-                      'bg-orange-600/10 border-orange-600/30',
+                      'bg-muted border-border',
+                      'bg-muted border-border',
+                      'bg-muted border-border',
                     ];
 
                     return (
@@ -111,7 +111,7 @@ export const TopPerformers = memo(function TopPerformers({ nodes }: TopPerformer
                         className={`flex items-center justify-between p-3 rounded-lg border ${bgColors[rank]} hover:border-primary transition-colors`}
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <span className="text-xl">{medals[rank]}</span>
+                          <span className="text-sm font-bold text-muted-foreground">{rankLabels[rank]}</span>
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-sm text-foreground truncate">
                               {item.node.moniker}

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useAllPNodes, useNetworkStats } from "@/lib/hooks";
+import { Header } from "@/components/Header";
 import { NetworkStatsDisplay } from "@/components/NetworkStats";
 import { NetworkHealthGrade } from "@/components/NetworkHealthGrade";
 import { NodeCard } from "@/components/NodeCard";
@@ -76,29 +77,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-lg">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
-                XandScan
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                Xandeum pNode Network Explorer
-              </p>
-            </div>
-            <nav className="flex gap-2">
-              <Link href="/">
-                <Button variant="ghost" className="text-foreground hover:text-primary">Dashboard</Button>
-              </Link>
-              <Link href="/nodes">
-                <Button variant="ghost" className="text-foreground hover:text-primary">Nodes</Button>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

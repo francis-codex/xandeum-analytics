@@ -43,63 +43,63 @@ function calculateNetworkGrade(stats: NetworkStats): {
 
   // Determine grade
   let grade = 'F';
-  let color = 'text-red-500';
+  let color = 'text-foreground';
   let status = 'Critical';
   let icon = AlertTriangle;
 
   if (score >= 90) {
     grade = 'A+';
-    color = 'text-green-500';
+    color = 'text-foreground';
     status = 'Excellent';
     icon = CheckCircle;
   } else if (score >= 85) {
     grade = 'A';
-    color = 'text-green-500';
+    color = 'text-foreground';
     status = 'Excellent';
     icon = CheckCircle;
   } else if (score >= 80) {
     grade = 'A-';
-    color = 'text-green-400';
+    color = 'text-foreground';
     status = 'Very Good';
     icon = TrendingUp;
   } else if (score >= 75) {
     grade = 'B+';
-    color = 'text-green-400';
+    color = 'text-foreground';
     status = 'Good';
     icon = TrendingUp;
   } else if (score >= 70) {
     grade = 'B';
-    color = 'text-blue-500';
+    color = 'text-foreground';
     status = 'Good';
     icon = TrendingUp;
   } else if (score >= 65) {
     grade = 'B-';
-    color = 'text-blue-400';
+    color = 'text-foreground';
     status = 'Fair';
     icon = Shield;
   } else if (score >= 60) {
     grade = 'C+';
-    color = 'text-yellow-500';
+    color = 'text-foreground';
     status = 'Fair';
     icon = Shield;
   } else if (score >= 55) {
     grade = 'C';
-    color = 'text-yellow-500';
+    color = 'text-foreground';
     status = 'Average';
     icon = Shield;
   } else if (score >= 50) {
     grade = 'C-';
-    color = 'text-orange-500';
+    color = 'text-foreground';
     status = 'Below Average';
     icon = AlertTriangle;
   } else if (score >= 40) {
     grade = 'D';
-    color = 'text-orange-600';
+    color = 'text-foreground';
     status = 'Poor';
     icon = AlertTriangle;
   } else {
     grade = 'F';
-    color = 'text-red-500';
+    color = 'text-foreground';
     status = 'Critical';
     icon = AlertTriangle;
   }
@@ -114,7 +114,7 @@ export const NetworkHealthGrade = memo(function NetworkHealthGrade({ stats }: Ne
     <Card className="border-2 bg-gradient-to-br from-card to-card/50">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Shield className="h-5 w-5 text-primary" />
+          <Shield className="h-5 w-5 text-foreground" />
           Network Health Grade
         </CardTitle>
       </CardHeader>
@@ -136,16 +136,7 @@ export const NetworkHealthGrade = memo(function NetworkHealthGrade({ stats }: Ne
           <Icon className={`h-12 w-12 ${color}`} />
         </div>
 
-        <div className={`text-center py-2 px-4 rounded-lg ${
-          status === 'Excellent' ? 'bg-green-500/10 text-green-500' :
-          status === 'Very Good' ? 'bg-green-400/10 text-green-400' :
-          status === 'Good' ? 'bg-blue-500/10 text-blue-500' :
-          status === 'Fair' ? 'bg-yellow-500/10 text-yellow-500' :
-          status === 'Average' ? 'bg-yellow-500/10 text-yellow-500' :
-          status === 'Below Average' ? 'bg-orange-500/10 text-orange-500' :
-          status === 'Poor' ? 'bg-orange-600/10 text-orange-600' :
-          'bg-red-500/10 text-red-500'
-        }`}>
+        <div className="text-center py-2 px-4 rounded-lg bg-muted text-foreground">
           <span className="text-sm font-semibold">
             Network Status: {status}
           </span>

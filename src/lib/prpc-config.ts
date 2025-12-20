@@ -9,17 +9,20 @@ import type { PRpcClientConfig } from '@/types/prpc';
 
 /**
  * Known working pNode endpoints
- * These pNodes have open pRPC ports on 6000
  *
  * Source: Xandeum team communication (Dec 2024)
- * Status: Verified working as of 2024-12-10
+ * Status: Only port 6000 endpoints are accessible from our server
+ * Note: Port 9001 endpoints exist in the gossip network but are firewalled
+ * Last Updated: 2024-12-20
+ *
+ * Total: 8 verified working endpoints
  */
 export const PNODE_ENDPOINTS = [
-  'http://173.212.203.145:6000/rpc',  // ✅ Verified - 219 GB storage
+  // Confirmed working endpoints (port 6000 - publicly accessible)
+  'http://173.212.203.145:6000/rpc',
   'http://173.212.220.65:6000/rpc',
-  'http://161.97.97.41:6000/rpc',     // ✅ Verified - 20 GB storage
-  'http://192.190.136.36:6000/rpc',   // ✅ Verified - 558 GB storage
-  'http://192.190.136.37:6000/rpc',
+  'http://161.97.97.41:6000/rpc',
+  'http://192.190.136.36:6000/rpc',
   'http://192.190.136.38:6000/rpc',
   'http://192.190.136.28:6000/rpc',
   'http://192.190.136.29:6000/rpc',

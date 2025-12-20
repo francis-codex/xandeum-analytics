@@ -10,15 +10,15 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   const variants = {
     active: {
       label: 'Active',
-      className: 'bg-green-500/10 text-green-500 border-green-500/20',
+      className: 'bg-muted text-foreground border-border',
     },
     inactive: {
       label: 'Inactive',
-      className: 'bg-red-500/10 text-red-500 border-red-500/20',
+      className: 'bg-muted text-muted-foreground border-border',
     },
     syncing: {
       label: 'Syncing',
-      className: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+      className: 'bg-muted text-muted-foreground border-border',
     },
   };
 
@@ -31,14 +31,14 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     >
       <span className="relative flex h-2 w-2 mr-1.5">
         {status === 'active' && (
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
         )}
         <span
           className={cn(
             "relative inline-flex rounded-full h-2 w-2",
-            status === 'active' && 'bg-green-500',
-            status === 'inactive' && 'bg-red-500',
-            status === 'syncing' && 'bg-yellow-500'
+            status === 'active' && 'bg-primary',
+            status === 'inactive' && 'bg-muted-foreground',
+            status === 'syncing' && 'bg-muted-foreground'
           )}
         ></span>
       </span>

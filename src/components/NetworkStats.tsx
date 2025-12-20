@@ -19,7 +19,7 @@ export const NetworkStatsDisplay = memo(function NetworkStatsDisplay({ stats }: 
       value: formatNumber(stats.totalNodes),
       subtitle: `${stats.activeNodes} active, ${stats.inactiveNodes} inactive`,
       icon: Server,
-      color: "text-blue-500",
+      color: "text-foreground",
       pulse: true, // Add pulse animation
     },
     {
@@ -27,21 +27,21 @@ export const NetworkStatsDisplay = memo(function NetworkStatsDisplay({ stats }: 
       value: formatBytes(stats.totalStorage),
       subtitle: `${formatBytes(stats.usedStorage)} used (${formatPercentage(storageUsagePercentage, 1)})`,
       icon: HardDrive,
-      color: "text-purple-500",
+      color: "text-foreground",
     },
     {
       title: "Network Uptime",
       value: formatPercentage(stats.avgUptime, 2),
       subtitle: `Avg latency: ${stats.avgLatency.toFixed(0)}ms`,
       icon: Activity,
-      color: "text-green-500",
+      color: "text-foreground",
     },
     {
       title: "Decentralization",
       value: formatPercentage(stats.decentralizationScore, 1),
       subtitle: `Version: ${stats.networkVersion}`,
       icon: Globe,
-      color: "text-orange-500",
+      color: "text-foreground",
     },
   ];
 

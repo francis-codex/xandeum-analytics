@@ -27,23 +27,17 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-500';
-    if (score >= 70) return 'text-yellow-500';
-    if (score >= 50) return 'text-orange-500';
-    return 'text-red-500';
+    return 'text-foreground';
   };
 
   const getScoreBg = (score: number) => {
-    if (score >= 90) return 'bg-green-50 dark:bg-green-950/20';
-    if (score >= 70) return 'bg-yellow-50 dark:bg-yellow-950/20';
-    if (score >= 50) return 'bg-orange-50 dark:bg-orange-950/20';
-    return 'bg-red-50 dark:bg-red-950/20';
+    return 'bg-muted';
   };
 
   const getTrendIcon = (score: number) => {
-    if (score >= 90) return <TrendingUp className="h-4 w-4 text-green-500" />;
-    if (score >= 70) return <Minus className="h-4 w-4 text-yellow-500" />;
-    return <TrendingDown className="h-4 w-4 text-orange-500" />;
+    if (score >= 90) return <TrendingUp className="h-4 w-4 text-foreground" />;
+    if (score >= 70) return <Minus className="h-4 w-4 text-muted-foreground" />;
+    return <TrendingDown className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getStatusLabel = (score: number) => {
@@ -72,7 +66,7 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
       <CardContent>
         <div className="space-y-6">
           {/* Total Score Display */}
-          <div className={`text-center p-8 rounded-xl ${getScoreBg(totalScore)} border-2 ${getScoreColor(totalScore).replace('text', 'border')}`}>
+          <div className={`text-center p-8 rounded-xl ${getScoreBg(totalScore)} border-2 border-border`}>
             <div className="flex items-center justify-center gap-3 mb-2">
               {getTrendIcon(totalScore)}
               <div className={`text-6xl font-bold ${getScoreColor(totalScore)}`}>
@@ -91,7 +85,7 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
             </h4>
 
             {/* Storage Health */}
-            <div className="p-4 bg-gradient-to-r from-purple-50 to-transparent dark:from-purple-950/20 dark:to-transparent rounded-lg border border-purple-200 dark:border-purple-900">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-900 dark:text-gray-50">Storage Health</span>
@@ -105,16 +99,16 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
                 <span>Optimal capacity utilization (60-80%)</span>
                 <span className="font-mono">× 0.30 = {(storageHealth * weights.storage).toFixed(1)}</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+              <div className="w-full bg-border rounded-full h-2 mt-2">
                 <div
-                  className="bg-purple-500 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${storageHealth}%` }}
                 />
               </div>
             </div>
 
             {/* Availability */}
-            <div className="p-4 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-950/20 dark:to-transparent rounded-lg border border-blue-200 dark:border-blue-900">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-900 dark:text-gray-50">Availability</span>
@@ -128,16 +122,16 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
                 <span>Active nodes providing storage access</span>
                 <span className="font-mono">× 0.30 = {(availability * weights.availability).toFixed(1)}</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+              <div className="w-full bg-border rounded-full h-2 mt-2">
                 <div
-                  className="bg-blue-500 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${availability}%` }}
                 />
               </div>
             </div>
 
             {/* Version Health */}
-            <div className="p-4 bg-gradient-to-r from-green-50 to-transparent dark:from-green-950/20 dark:to-transparent rounded-lg border border-green-200 dark:border-green-900">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-900 dark:text-gray-50">Version Health</span>
@@ -151,16 +145,16 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
                 <span>Nodes on latest version</span>
                 <span className="font-mono">× 0.25 = {(versionHealth * weights.version).toFixed(1)}</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+              <div className="w-full bg-border rounded-full h-2 mt-2">
                 <div
-                  className="bg-green-500 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${versionHealth}%` }}
                 />
               </div>
             </div>
 
             {/* Distribution */}
-            <div className="p-4 bg-gradient-to-r from-orange-50 to-transparent dark:from-orange-950/20 dark:to-transparent rounded-lg border border-orange-200 dark:border-orange-900">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-900 dark:text-gray-50">Distribution</span>
@@ -174,9 +168,9 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
                 <span>Geographic diversity & decentralization</span>
                 <span className="font-mono">× 0.15 = {(distribution * weights.distribution).toFixed(1)}</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+              <div className="w-full bg-border rounded-full h-2 mt-2">
                 <div
-                  className="bg-orange-500 h-2 rounded-full transition-all"
+                  className="bg-primary h-2 rounded-full transition-all"
                   style={{ width: `${distribution}%` }}
                 />
               </div>
@@ -184,7 +178,7 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
           </div>
 
           {/* Formula Display */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-lg border-2 border-blue-300 dark:border-blue-800">
+          <div className="mt-6 p-4 bg-muted rounded-lg border border-border">
             <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 text-center">
               Health Score Formula:
             </p>
@@ -200,8 +194,8 @@ export function HealthScoreBreakdown({ health }: HealthScoreBreakdownProps) {
           </div>
 
           {/* Storage Focus Callout */}
-          <div className="mt-4 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
-            <p className="text-xs text-purple-900 dark:text-purple-100">
+          <div className="mt-4 p-3 bg-muted rounded-lg border border-border">
+            <p className="text-xs text-foreground">
               <strong>Storage-First Scoring:</strong> Optimized for Xandeum&apos;s mission to provide exabyte-scale storage for Solana dApps. Storage health and availability are weighted highest (60% combined).
             </p>
           </div>
