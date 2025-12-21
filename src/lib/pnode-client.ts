@@ -17,10 +17,12 @@ import type {
   JsonRpcRequest,
   JsonRpcResponse,
   PNodeStats,
+  GetPodsWithStatsResponse,
+  PodCredits,
 } from '@/types/prpc';
 import { PRpcMethod } from '@/types/prpc';
-import { getPRpcConfig } from './prpc-config';
-import { transformPNodeStats, transformNetworkStats } from './prpc-transformer';
+import { getPRpcConfig, POD_CREDITS_API } from './prpc-config';
+import { transformPNodeStats, transformNetworkStats, transformPodWithStats } from './prpc-transformer';
 import { circuitBreaker } from './circuit-breaker';
 
 /**
@@ -30,6 +32,10 @@ export class PNodeClient {
   private config = getPRpcConfig();
   private currentEndpointIndex = 0;
   private requestIdCounter = 0;
+  private discoveredNodesCache: PNode[] | null = null;
+  private creditsCache: Map<string, number> = new Map();
+  private lastDiscoveryTime = 0;
+  private readonly DISCOVERY_CACHE_TTL = 60000; // 1 minute
 
   /**
    * Get the next endpoint in round-robin fashion
@@ -132,10 +138,120 @@ export class PNodeClient {
   }
 
   /**
-   * Get all pNodes from the network
-   * Queries each known pNode endpoint and aggregates results
+   * Discover all pNodes using get-pods-with-stats from any available endpoint
+   * This is the NEW and PREFERRED method as it returns all network nodes
    */
-  async getAllPNodes(): Promise<PNode[]> {
+  async discoverAllPNodes(): Promise<PNode[]> {
+    // Check cache first
+    const now = Date.now();
+    if (this.discoveredNodesCache && (now - this.lastDiscoveryTime) < this.DISCOVERY_CACHE_TTL) {
+      return this.discoveredNodesCache;
+    }
+
+    try {
+      // Try each endpoint until we get a successful response
+      let podsResponse: GetPodsWithStatsResponse | null = null;
+      let successfulEndpoint: string | null = null;
+
+      for (const endpoint of this.config.endpoints) {
+        if (circuitBreaker.isOpen(endpoint)) {
+          continue; // Skip if circuit breaker is open
+        }
+
+        try {
+          podsResponse = await this.makeRpcRequest<GetPodsWithStatsResponse>(
+            PRpcMethod.GET_PODS_WITH_STATS,
+            undefined,
+            endpoint
+          );
+          successfulEndpoint = endpoint;
+          circuitBreaker.recordSuccess(endpoint);
+          break; // Success! Stop trying other endpoints
+        } catch (error) {
+          circuitBreaker.recordFailure(endpoint);
+          continue; // Try next endpoint
+        }
+      }
+
+      if (!podsResponse || !podsResponse.pods) {
+        throw new Error('Failed to discover nodes from any endpoint');
+      }
+
+      // Transform all pods to PNode format
+      // Note: We include ALL nodes (both public and private) to show the full network
+      const allNodes = podsResponse.pods
+        .map(pod => transformPodWithStats(pod))
+        .filter((node): node is PNode => node !== null); // Filter out null results
+
+      // Deduplicate by public key - keep the one with most recent last_seen
+      const nodeMap = new Map<string, PNode>();
+      allNodes.forEach(node => {
+        const existing = nodeMap.get(node.publicKey);
+        if (!existing || node.lastSeen > existing.lastSeen) {
+          nodeMap.set(node.publicKey, node);
+        }
+      });
+
+      const discoveredNodes = Array.from(nodeMap.values());
+
+      // Fetch and merge pod credits
+      await this.fetchAndMergeCredits(discoveredNodes);
+
+      // Update cache
+      this.discoveredNodesCache = discoveredNodes;
+      this.lastDiscoveryTime = now;
+
+      console.log(`Discovered ${discoveredNodes.length} unique pNodes (${allNodes.length} total pods) from ${successfulEndpoint}`);
+
+      return discoveredNodes;
+    } catch (error) {
+      console.error('Node discovery failed:', error);
+
+      // Return cached data if available
+      if (this.discoveredNodesCache) {
+        console.log('Using cached node data');
+        return this.discoveredNodesCache;
+      }
+
+      // Fallback to old method
+      return this.getAllPNodesLegacy();
+    }
+  }
+
+  /**
+   * Fetch pod credits and merge with node data
+   */
+  private async fetchAndMergeCredits(nodes: PNode[]): Promise<void> {
+    try {
+      const response = await axios.get<Record<string, PodCredits>>(
+        POD_CREDITS_API,
+        { timeout: 5000 }
+      );
+
+      // Merge credits into cache
+      Object.entries(response.data).forEach(([pubkey, data]) => {
+        this.creditsCache.set(pubkey, data.credits);
+      });
+
+      // Add credits to nodes (stored in stakingInfo.rewards for now)
+      nodes.forEach(node => {
+        const credits = this.creditsCache.get(node.publicKey);
+        if (credits !== undefined && node.stakingInfo) {
+          node.stakingInfo.rewards = credits;
+        }
+      });
+    } catch (error) {
+      console.warn('Failed to fetch pod credits:', error);
+      // Non-critical, continue without credits
+    }
+  }
+
+  /**
+   * Get all pNodes from the network (LEGACY METHOD)
+   * Queries each known pNode endpoint and aggregates results
+   * @deprecated Use discoverAllPNodes() instead
+   */
+  private async getAllPNodesLegacy(): Promise<PNode[]> {
     try {
       // Query all endpoints in parallel
       const results = await Promise.allSettled(
@@ -165,6 +281,14 @@ export class PNodeClient {
 
       throw error;
     }
+  }
+
+  /**
+   * Get all pNodes from the network
+   * Uses the new discovery method by default
+   */
+  async getAllPNodes(): Promise<PNode[]> {
+    return this.discoverAllPNodes();
   }
 
   /**
@@ -259,6 +383,57 @@ export class PNodeClient {
       return allNodes.filter(node => node.status === status);
     } catch {
       return [];
+    }
+  }
+
+  /**
+   * Get pod credits for a specific public key
+   */
+  async getPodCredits(publicKey: string): Promise<number | null> {
+    // Check cache first
+    if (this.creditsCache.has(publicKey)) {
+      return this.creditsCache.get(publicKey) || null;
+    }
+
+    try {
+      const response = await axios.get<Record<string, PodCredits>>(
+        POD_CREDITS_API,
+        { timeout: 5000 }
+      );
+
+      // Update cache
+      Object.entries(response.data).forEach(([pubkey, data]) => {
+        this.creditsCache.set(pubkey, data.credits);
+      });
+
+      return this.creditsCache.get(publicKey) || null;
+    } catch (error) {
+      console.warn('Failed to fetch pod credits:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get all pod credits
+   */
+  async getAllPodCredits(): Promise<Map<string, number>> {
+    try {
+      const response = await axios.get<Record<string, PodCredits>>(
+        POD_CREDITS_API,
+        { timeout: 5000 }
+      );
+
+      // Update cache
+      const credits = new Map<string, number>();
+      Object.entries(response.data).forEach(([pubkey, data]) => {
+        credits.set(pubkey, data.credits);
+        this.creditsCache.set(pubkey, data.credits);
+      });
+
+      return credits;
+    } catch (error) {
+      console.warn('Failed to fetch pod credits:', error);
+      return this.creditsCache;
     }
   }
 

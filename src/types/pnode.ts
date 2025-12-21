@@ -15,6 +15,7 @@ export interface PNode {
   lastSeen: Date;
   stakingInfo?: StakingInfo;
   healthScore?: number; // Composite metric 0-100
+  isPublic?: boolean; // Whether the node is publicly accessible
 }
 
 export interface StorageInfo {

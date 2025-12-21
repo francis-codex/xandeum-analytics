@@ -92,7 +92,7 @@ export const GeographicDistribution = memo(function GeographicDistribution({
 
             return (
               <div
-                key={data.countryCode}
+                key={`${data.country}-${data.countryCode}-${index}`}
                 className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border hover:border-primary transition-colors"
               >
                 {/* Rank Badge */}

@@ -177,12 +177,67 @@ export interface PRpcClientConfig {
 }
 
 /**
+ * Pod information from get-pods-with-stats
+ * Response structure from v0.7.0+
+ */
+export interface PodWithStats {
+  /** IP address and port of the pod */
+  address: string;
+
+  /** Whether the pod is publicly accessible (can be null) */
+  is_public: boolean | null;
+
+  /** Unix timestamp when pod was last seen (can be null) */
+  last_seen_timestamp: number | null;
+
+  /** Public key of the pod (can be null for some nodes) */
+  pubkey: string | null;
+
+  /** RPC port number */
+  rpc_port: number;
+
+  /** Storage committed in bytes */
+  storage_committed: number;
+
+  /** Storage usage percentage (0-100) */
+  storage_usage_percent: number;
+
+  /** Storage used in bytes */
+  storage_used: number;
+
+  /** Uptime in seconds */
+  uptime: number;
+
+  /** Pod version string (can be null) */
+  version: string | null;
+}
+
+/**
+ * Response from get-pods-with-stats method
+ */
+export interface GetPodsWithStatsResponse {
+  pods: PodWithStats[];
+}
+
+/**
+ * Pod credits data from credits API
+ */
+export interface PodCredits {
+  pubkey: string;
+  credits: number;
+  last_updated?: number;
+}
+
+/**
  * Available pRPC methods
  */
 export enum PRpcMethod {
   /** Get statistics for a single pNode */
   GET_STATS = 'get-stats',
 
-  /** Get all pNodes (coming soon) */
+  /** Get all pNodes with statistics (v0.7.0+) */
+  GET_PODS_WITH_STATS = 'get-pods-with-stats',
+
+  /** Get all pNodes (deprecated - use GET_PODS_WITH_STATS) */
   GET_ALL_PNODES = 'get-all-pnodes',
 }

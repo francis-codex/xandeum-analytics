@@ -3,6 +3,7 @@
 import { memo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Badge } from "./ui/badge";
 import { StatusBadge } from "./StatusBadge";
 import {
   formatBytes,
@@ -10,7 +11,7 @@ import {
   truncatePublicKey,
   formatTimeAgo,
 } from "@/lib/utils";
-import { MapPin, HardDrive, Zap, Clock } from "lucide-react";
+import { MapPin, HardDrive, Zap, Clock, Lock, Unlock } from "lucide-react";
 import type { PNode } from "@/types/pnode";
 
 interface NodeCardProps {
@@ -30,10 +31,30 @@ export const NodeCard = memo(function NodeCard({ node }: NodeCardProps) {
       <Card className="hover:shadow-lg transition-shadow cursor-pointer">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <CardTitle className="text-lg font-semibold">
-                {node.moniker}
-              </CardTitle>
+            <div className="space-y-1 flex-1">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-lg font-semibold">
+                  {node.moniker}
+                </CardTitle>
+                {node.isPublic !== undefined && (
+                  <Badge
+                    variant={node.isPublic ? "default" : "secondary"}
+                    className="text-xs flex items-center gap-1"
+                  >
+                    {node.isPublic ? (
+                      <>
+                        <Unlock className="h-3 w-3" />
+                        Public
+                      </>
+                    ) : (
+                      <>
+                        <Lock className="h-3 w-3" />
+                        Private
+                      </>
+                    )}
+                  </Badge>
+                )}
+              </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                 {truncatePublicKey(node.publicKey)}
               </p>
